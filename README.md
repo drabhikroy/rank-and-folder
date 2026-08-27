@@ -1,4 +1,4 @@
-<div align="center">
+<div align="left">
 
 <img src="Assets/AppIcon.svg" width="128" alt="">
 
