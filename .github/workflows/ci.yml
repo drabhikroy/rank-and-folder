@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  core-tests:
+    name: Shared core tests
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_16.app
+
+      - name: Run Swift Package tests
+        run: swift test
+
+  app-build:
+    name: Unsigned app build
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_16.app
+
+      - name: Build without signing
+        run: |
+          xcodebuild \
+            -project RankAndFolder.xcodeproj \
+            -scheme RankAndFolder \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            SWIFT_TREAT_WARNINGS_AS_ERRORS=YES \
+            GCC_TREAT_WARNINGS_AS_ERRORS=YES \
+            build
+
+  house-style:
+    name: House writing rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reject em and en dashes
+        run: |
+          if grep -rn $'\u2014\|\u2013' --include='*.swift' --include='*.md' \
+              --include='*.sh' . ; then
+            echo "Em or en dash found. Use a comma, a period, or a rewrite."
+            exit 1
+          fi
+
+      - name: Reject contractions outside test fixtures
+        run: |
+          if grep -rniE "\b(don't|doesn't|isn't|aren't|won't|can't|it's|you're|we're|didn't|hasn't|haven't|wasn't|weren't|couldn't|shouldn't|wouldn't|that's|there's|let's|you'll|we'll|i'm|they're)\b" \
+              --include='*.swift' --include='*.md' --include='*.sh' \
+              --exclude-dir=Tests . ; then
+            echo "Contraction found. Write the words out."
+            exit 1
+          fi
+
+      - name: Reject the system accent color in interface code
+        run: |
+          if grep -rn "accentColor" --include='*.swift' . ; then
+            echo "Use RankFolderPalette.accent. The system accent is not contrast audited."
+            exit 1
+          fi

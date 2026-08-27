@@ -1,0 +1,17 @@
+* text=auto eol=lf
+
+*.swift   text diff=swift
+*.md      text
+*.sh      text eol=lf
+*.plist   text
+*.xcconfig text
+*.entitlements text
+
+*.pbxproj        text merge=union
+*.xcscheme       text
+*.png            binary
+*.icns           binary
+*.zip            binary
+
+Docs/**      linguist-documentation
+*.md         linguist-documentation

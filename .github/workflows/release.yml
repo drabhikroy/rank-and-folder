@@ -1,0 +1,47 @@
+name: Release
+
+# Builds the zip and publishes it whenever a version tag is pushed, so a release
+# never depends on whatever happened to be on one person's Mac.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and publish
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -switch /Applications/Xcode_16.app
+
+      - name: Install librsvg for the icon
+        run: brew install librsvg
+
+      - name: Run core tests
+        run: swift test
+
+      # Runs headless, so the script skips the Finder window styling and the
+      # disk image keeps a default layout. Everything else is identical to a
+      # build made on a desktop.
+      - name: Build the disk image and the zip
+        run: ./Scripts/build-standalone.sh
+
+      - name: Show what was built
+        run: |
+          ls -lh dist
+          cat dist/SHA256SUMS.txt
+
+      - name: Publish the release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.dmg
+            dist/*.zip
+            dist/SHA256SUMS.txt
+          body_path: .github/RELEASE_TEMPLATE.md
+          draft: true

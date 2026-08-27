@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Rank &amp; Folder">
+  <title>Rank &amp; Folder dark appearance</title>
+  <desc>The dark appearance variant for macOS 26. The structure is unchanged, because the mark already puts a light folder on a dark field. The field deepens and the folder steps one stop down the same warm ramp so it does not glare in a dark room.</desc>
+
+  <defs>
+    <clipPath id="tile">
+      <rect x="100" y="100" width="824" height="824" rx="184"/>
+    </clipPath>
+  </defs>
+
+  <!-- Field -->
+  <rect x="100" y="100" width="824" height="824" rx="184" fill="#0A0D0C"/>
+
+  <g clip-path="url(#tile)">
+    <!-- Folder -->
+    <path d="M218 232H418L499 313H806A40 40 0 0 1 846 353V768A40 40 0 0 1 806 808H218A40 40 0 0 1 178 768V272A40 40 0 0 1 218 232Z" fill="#CBB294"/>
+
+    <!-- Branch lines, drawn before the bars so no line crosses over one -->
+    <path d="M251 416V668" fill="none" stroke="#4C5661" stroke-width="15" stroke-linecap="butt"/>
+    <path d="M251 464A18 18 0 0 0 269 482H334" fill="none" stroke="#4C5661" stroke-width="15" stroke-linecap="butt"/>
+    <path d="M251 668A18 18 0 0 0 269 686H334" fill="none" stroke="#4C5661" stroke-width="15" stroke-linecap="butt"/>
+    <path d="M344 492V592" fill="none" stroke="#4C5661" stroke-width="15" stroke-linecap="butt"/>
+    <path d="M344 528A18 18 0 0 0 362 546H430" fill="none" stroke="#4C5661" stroke-width="15" stroke-linecap="butt"/>
+    <path d="M344 592A18 18 0 0 0 362 610H430" fill="none" stroke="#4C5661" stroke-width="15" stroke-linecap="butt"/>
+
+    <!-- Section headings and the items under them -->
+    <rect x="228" y="380" width="424" height="46" rx="23" fill="#095F54"/>
+    <rect x="324" y="462" width="366" height="40" rx="20" fill="#633375"/>
+    <rect x="420" y="526" width="314" height="40" rx="20" fill="#B02F3B"/>
+    <rect x="420" y="590" width="246" height="40" rx="20" fill="#B02F3B"/>
+    <rect x="324" y="666" width="336" height="40" rx="20" fill="#633375"/>
+  </g>
+</svg>

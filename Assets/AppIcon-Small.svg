@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Rank &amp; Folder">
+  <title>Rank &amp; Folder small size</title>
+  <desc>The Rank &amp; Folder mark reduced to one heading, one heading inside it, and one item, with thicker bars and branch lines. At and below 32 points the wider tree closes up and the rows merge.</desc>
+
+  <defs>
+    <clipPath id="tile">
+      <rect x="100" y="100" width="824" height="824" rx="184"/>
+    </clipPath>
+  </defs>
+
+  <!-- Field -->
+  <rect x="100" y="100" width="824" height="824" rx="184" fill="#0E1210"/>
+
+  <g clip-path="url(#tile)">
+    <!-- Folder -->
+    <path d="M212 236H417L497 316H812A40 40 0 0 1 852 356V764A40 40 0 0 1 812 804H212A40 40 0 0 1 172 764V276A40 40 0 0 1 212 236Z" fill="#D6BA9A"/>
+
+    <!-- Branch lines, drawn before the bars so no line crosses over one -->
+    <path d="M253 458V524" fill="none" stroke="#4C5661" stroke-width="22" stroke-linecap="butt"/>
+    <path d="M253 524A18 18 0 0 0 271 542H344" fill="none" stroke="#4C5661" stroke-width="22" stroke-linecap="butt"/>
+    <path d="M362 560V627" fill="none" stroke="#4C5661" stroke-width="22" stroke-linecap="butt"/>
+    <path d="M362 627A18 18 0 0 0 380 645H456" fill="none" stroke="#4C5661" stroke-width="22" stroke-linecap="butt"/>
+
+    <!-- Section headings and the items under them -->
+    <rect x="222" y="406" width="432" height="62" rx="31" fill="#095F54"/>
+    <rect x="334" y="514" width="360" height="56" rx="28" fill="#633375"/>
+    <rect x="446" y="616" width="300" height="58" rx="29" fill="#B02F3B"/>
+  </g>
+</svg>

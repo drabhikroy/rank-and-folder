@@ -1,0 +1,19 @@
+// Change these two values before signing with your Apple Developer account.
+BASE_BUNDLE_IDENTIFIER = dev.rankandfolder.RankAndFolder
+APP_GROUP_IDENTIFIER = group.dev.rankandfolder.RankAndFolder
+
+// The bundle carries the ampersand for the person reading it. The identifiers
+// above and the target names do not, because an ampersand is awkward in a
+// reverse DNS identifier and in a shell path.
+PRODUCT_DISPLAY_NAME = Rank & Folder
+
+MACOSX_DEPLOYMENT_TARGET = 14.0
+// The app target stays in Swift 5 language mode. Shared/ also builds under
+// Swift 6 rules through Package.swift, so raising this value is a deliberate,
+// separately verified migration rather than a configuration edit.
+SWIFT_VERSION = 5.0
+MARKETING_VERSION = 1.0.0
+CURRENT_PROJECT_VERSION = 1
+CODE_SIGN_STYLE = Automatic
+DEVELOPMENT_TEAM =
+ENABLE_HARDENED_RUNTIME = YES

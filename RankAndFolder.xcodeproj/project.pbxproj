@@ -1,0 +1,409 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10000000000000000000001 /* AccessibilityPermission.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000001 /* AccessibilityPermission.swift */; };
+		A10000000000000000000002 /* FinderAccessibilityClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000002 /* FinderAccessibilityClient.swift */; };
+		A10000000000000000000003 /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000003 /* ProfileStore.swift */; };
+		A10000000000000000000004 /* AutomationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000004 /* AutomationCoordinator.swift */; };
+		A10000000000000000000005 /* AppServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000005 /* AppServices.swift */; };
+		A10000000000000000000006 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000006 /* ContentView.swift */; };
+		A10000000000000000000007 /* ProfileEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000007 /* ProfileEditorView.swift */; };
+		A10000000000000000000008 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000008 /* AppDelegate.swift */; };
+		A10000000000000000000009 /* RankFolderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000009 /* RankFolderApp.swift */; };
+		A1000000000000000000000A /* RankFolderProfile.swift in App Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000A /* RankFolderProfile.swift */; };
+		A1000000000000000000000B /* SharedConfiguration.swift in App Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000B /* SharedConfiguration.swift */; };
+		A1000000000000000000000C /* ProfileRepository.swift in App Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000C /* ProfileRepository.swift */; };
+		A1000000000000000000000D /* ApplyRequestQueue.swift in App Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000D /* ApplyRequestQueue.swift */; };
+		A1000000000000000000000E /* DarwinNotification.swift in App Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000E /* DarwinNotification.swift */; };
+		A1000000000000000000000F /* FinderSyncExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000F /* FinderSyncExtension.swift */; };
+		A10000000000000000000010 /* RankFolderProfile.swift in Extension Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000A /* RankFolderProfile.swift */; };
+		A10000000000000000000011 /* SharedConfiguration.swift in Extension Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000B /* SharedConfiguration.swift */; };
+		A10000000000000000000012 /* ProfileRepository.swift in Extension Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000C /* ProfileRepository.swift */; };
+		A10000000000000000000013 /* ApplyRequestQueue.swift in Extension Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000D /* ApplyRequestQueue.swift */; };
+		A10000000000000000000014 /* DarwinNotification.swift in Extension Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000000E /* DarwinNotification.swift */; };
+		A10000000000000000000015 /* RankAndFolder Finder Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = A20000000000000000000016 /* RankAndFolder Finder Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, CodeSignOnCopy, ); }; };
+		A10000000000000000000016 /* ProfileResolver.swift in App Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000019 /* ProfileResolver.swift */; };
+		A10000000000000000000018 /* DesignComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001A /* DesignComponents.swift */; };
+		A10000000000000000000019 /* FinderFolderMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001B /* FinderFolderMonitor.swift */; };
+		A1000000000000000000001A /* AppearancePreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001C /* AppearancePreferences.swift */; };
+		A1000000000000000000001B /* AdvancedFolderPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001D /* AdvancedFolderPreview.swift */; };
+		A1000000000000000000001C /* OnboardingAndHelp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001E /* OnboardingAndHelp.swift */; };
+		A1000000000000000000001D /* SmartSuggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000001F /* SmartSuggestions.swift */; };
+		A1000000000000000000001E /* SuggestionValidation.swift in App Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000020 /* SuggestionValidation.swift */; };
+		A1000000000000000000001F /* FolderInheritanceBoundary.swift in App Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000021 /* FolderInheritanceBoundary.swift */; };
+		A10000000000000000000020 /* BoundaryRepository.swift in App Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000022 /* BoundaryRepository.swift */; };
+		A10000000000000000000021 /* FolderRelationshipChecker.swift in App Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000023 /* FolderRelationshipChecker.swift */; };
+		A10000000000000000000022 /* ManagedOllamaRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000024 /* ManagedOllamaRuntime.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A30000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A70000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A60000000000000000000002;
+			remoteInfo = "RankAndFolder Finder Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A40000000000000000000001 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A10000000000000000000015 /* RankAndFolder Finder Extension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		A20000000000000000000001 /* AccessibilityPermission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityPermission.swift; sourceTree = "<group>"; };
+		A20000000000000000000002 /* FinderAccessibilityClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinderAccessibilityClient.swift; sourceTree = "<group>"; };
+		A20000000000000000000003 /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
+		A20000000000000000000004 /* AutomationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomationCoordinator.swift; sourceTree = "<group>"; };
+		A20000000000000000000005 /* AppServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppServices.swift; sourceTree = "<group>"; };
+		A20000000000000000000006 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		A20000000000000000000007 /* ProfileEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEditorView.swift; sourceTree = "<group>"; };
+		A20000000000000000000008 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		A20000000000000000000009 /* RankFolderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankFolderApp.swift; sourceTree = "<group>"; };
+		A2000000000000000000000A /* RankFolderProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankFolderProfile.swift; sourceTree = "<group>"; };
+		A2000000000000000000000B /* SharedConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedConfiguration.swift; sourceTree = "<group>"; };
+		A2000000000000000000000C /* ProfileRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileRepository.swift; sourceTree = "<group>"; };
+		A2000000000000000000000D /* ApplyRequestQueue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplyRequestQueue.swift; sourceTree = "<group>"; };
+		A2000000000000000000000E /* DarwinNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DarwinNotification.swift; sourceTree = "<group>"; };
+		A2000000000000000000000F /* FinderSyncExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinderSyncExtension.swift; sourceTree = "<group>"; };
+		A20000000000000000000010 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		A20000000000000000000011 /* App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "App-Info.plist"; sourceTree = "<group>"; };
+		A20000000000000000000012 /* Extension-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Extension-Info.plist"; sourceTree = "<group>"; };
+		A20000000000000000000013 /* RankFolder.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RankFolder.entitlements; sourceTree = "<group>"; };
+		A20000000000000000000014 /* RankFolderFinderSync.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RankFolderFinderSync.entitlements; sourceTree = "<group>"; };
+		A20000000000000000000015 /* RankAndFolder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RankAndFolder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000000000000000000016 /* RankAndFolder Finder Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "RankAndFolder Finder Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000000000000000000017 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		A20000000000000000000018 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		A20000000000000000000019 /* ProfileResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileResolver.swift; sourceTree = "<group>"; };
+		A2000000000000000000001A /* DesignComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignComponents.swift; sourceTree = "<group>"; };
+		A2000000000000000000001B /* FinderFolderMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinderFolderMonitor.swift; sourceTree = "<group>"; };
+		A2000000000000000000001C /* AppearancePreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearancePreferences.swift; sourceTree = "<group>"; };
+		A2000000000000000000001D /* AdvancedFolderPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedFolderPreview.swift; sourceTree = "<group>"; };
+		A2000000000000000000001E /* OnboardingAndHelp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingAndHelp.swift; sourceTree = "<group>"; };
+		A2000000000000000000001F /* SmartSuggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartSuggestions.swift; sourceTree = "<group>"; };
+		A20000000000000000000020 /* SuggestionValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionValidation.swift; sourceTree = "<group>"; };
+		A20000000000000000000021 /* FolderInheritanceBoundary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderInheritanceBoundary.swift; sourceTree = "<group>"; };
+		A20000000000000000000022 /* BoundaryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundaryRepository.swift; sourceTree = "<group>"; };
+		A20000000000000000000023 /* FolderRelationshipChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderRelationshipChecker.swift; sourceTree = "<group>"; };
+		A20000000000000000000024 /* ManagedOllamaRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagedOllamaRuntime.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A40000000000000000000002 /* App Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		A40000000000000000000003 /* Extension Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A50000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				A50000000000000000000002 /* App */,
+				A50000000000000000000003 /* FinderExtension */,
+				A50000000000000000000004 /* Shared */,
+				A50000000000000000000005 /* Config */,
+				A20000000000000000000017 /* README.md */,
+				A20000000000000000000018 /* Package.swift */,
+				A50000000000000000000006 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A50000000000000000000002 /* App */ = {
+			isa = PBXGroup;
+			path = App;
+			sourceTree = "<group>";
+			children = (
+				A20000000000000000000009 /* RankFolderApp.swift */,
+				A2000000000000000000001C /* AppearancePreferences.swift */,
+				A2000000000000000000001D /* AdvancedFolderPreview.swift */,
+				A2000000000000000000001E /* OnboardingAndHelp.swift */,
+				A2000000000000000000001F /* SmartSuggestions.swift */,
+				A20000000000000000000024 /* ManagedOllamaRuntime.swift */,
+				A20000000000000000000008 /* AppDelegate.swift */,
+				A20000000000000000000005 /* AppServices.swift */,
+				A20000000000000000000006 /* ContentView.swift */,
+				A20000000000000000000007 /* ProfileEditorView.swift */,
+				A20000000000000000000003 /* ProfileStore.swift */,
+				A20000000000000000000004 /* AutomationCoordinator.swift */,
+				A20000000000000000000001 /* AccessibilityPermission.swift */,
+				A20000000000000000000002 /* FinderAccessibilityClient.swift */,
+				A2000000000000000000001B /* FinderFolderMonitor.swift */,
+				A2000000000000000000001A /* DesignComponents.swift */,
+			);
+		};
+		A50000000000000000000003 /* FinderExtension */ = {
+			isa = PBXGroup;
+			path = FinderExtension;
+			sourceTree = "<group>";
+			children = (A2000000000000000000000F /* FinderSyncExtension.swift */,);
+		};
+		A50000000000000000000004 /* Shared */ = {
+			isa = PBXGroup;
+			path = Shared;
+			sourceTree = "<group>";
+			children = (
+				A2000000000000000000000A /* RankFolderProfile.swift */,
+				A2000000000000000000000B /* SharedConfiguration.swift */,
+				A2000000000000000000000C /* ProfileRepository.swift */,
+				A2000000000000000000000D /* ApplyRequestQueue.swift */,
+				A2000000000000000000000E /* DarwinNotification.swift */,
+				A20000000000000000000019 /* ProfileResolver.swift */,
+				A20000000000000000000020 /* SuggestionValidation.swift */,
+				A20000000000000000000021 /* FolderInheritanceBoundary.swift */,
+				A20000000000000000000022 /* BoundaryRepository.swift */,
+				A20000000000000000000023 /* FolderRelationshipChecker.swift */,
+			);
+		};
+		A50000000000000000000005 /* Config */ = {
+			isa = PBXGroup;
+			path = Config;
+			sourceTree = "<group>";
+			children = (
+				A20000000000000000000010 /* Base.xcconfig */,
+				A20000000000000000000011 /* App-Info.plist */,
+				A20000000000000000000012 /* Extension-Info.plist */,
+				A20000000000000000000013 /* RankFolder.entitlements */,
+				A20000000000000000000014 /* RankFolderFinderSync.entitlements */,
+			);
+		};
+		A50000000000000000000006 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+			children = (
+				A20000000000000000000015 /* RankAndFolder.app */,
+				A20000000000000000000016 /* RankAndFolder Finder Extension.appex */,
+			);
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A60000000000000000000001 /* RankAndFolder */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A80000000000000000000001 /* Build configuration list for PBXNativeTarget "RankAndFolder" */;
+			buildPhases = (
+				A40000000000000000000004 /* App Sources */,
+				A40000000000000000000002 /* App Frameworks */,
+				A40000000000000000000001 /* Embed App Extensions */,
+			);
+			buildRules = ();
+			dependencies = (A90000000000000000000001 /* PBXTargetDependency */,);
+			name = RankAndFolder;
+			productName = RankAndFolder;
+			productReference = A20000000000000000000015 /* RankAndFolder.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A60000000000000000000002 /* RankAndFolder Finder Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A80000000000000000000002 /* Build configuration list for PBXNativeTarget "RankAndFolder Finder Extension" */;
+			buildPhases = (
+				A40000000000000000000005 /* Extension Sources */,
+				A40000000000000000000003 /* Extension Frameworks */,
+			);
+			buildRules = ();
+			dependencies = ();
+			name = "RankAndFolder Finder Extension";
+			productName = "RankAndFolder Finder Extension";
+			productReference = A20000000000000000000016 /* RankAndFolder Finder Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A70000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					A60000000000000000000001 = {CreatedOnToolsVersion = 26.6; };
+					A60000000000000000000002 = {CreatedOnToolsVersion = 26.6; };
+				};
+			};
+			buildConfigurationList = A80000000000000000000003 /* Build configuration list for PBXProject "RankAndFolder" */;
+			compatibilityVersion = "Xcode 16.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base,);
+			mainGroup = A50000000000000000000001;
+			productRefGroup = A50000000000000000000006 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A60000000000000000000001 /* RankAndFolder */,
+				A60000000000000000000002 /* RankAndFolder Finder Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A40000000000000000000004 /* App Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000009,
+				A10000000000000000000008,
+				A10000000000000000000005,
+				A10000000000000000000006,
+				A10000000000000000000007,
+				A10000000000000000000003,
+				A10000000000000000000004,
+				A10000000000000000000001,
+				A10000000000000000000002,
+				A1000000000000000000000A,
+				A1000000000000000000000B,
+				A1000000000000000000000C,
+				A1000000000000000000000D,
+				A1000000000000000000000E,
+				A10000000000000000000016,
+				A10000000000000000000018,
+				A10000000000000000000019,
+				A1000000000000000000001A,
+				A1000000000000000000001B,
+				A1000000000000000000001C,
+				A1000000000000000000001D,
+				A1000000000000000000001E,
+				A1000000000000000000001F,
+				A10000000000000000000020,
+				A10000000000000000000021,
+				A10000000000000000000022,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A40000000000000000000005 /* Extension Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1000000000000000000000F,
+				A10000000000000000000010,
+				A10000000000000000000011,
+				A10000000000000000000012,
+				A10000000000000000000013,
+				A10000000000000000000014,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A90000000000000000000001 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = A60000000000000000000002 /* RankAndFolder Finder Extension */; targetProxy = A30000000000000000000001 /* PBXContainerItemProxy */; };
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		AA0000000000000000000001 /* Debug App */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A20000000000000000000010 /* Base.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/RankFolder.entitlements;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/App-Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_IDENTIFIER)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		AA0000000000000000000002 /* Release App */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A20000000000000000000010 /* Base.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Config/RankFolder.entitlements;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/App-Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_IDENTIFIER)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		AA0000000000000000000003 /* Debug Extension */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A20000000000000000000010 /* Base.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Config/RankFolderFinderSync.entitlements;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/Extension-Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_IDENTIFIER).FinderSync";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		AA0000000000000000000004 /* Release Extension */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A20000000000000000000010 /* Base.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = Config/RankFolderFinderSync.entitlements;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Config/Extension-Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BASE_BUNDLE_IDENTIFIER).FinderSync";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		AA0000000000000000000005 /* Debug Project */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A20000000000000000000010 /* Base.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AA0000000000000000000006 /* Release Project */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A20000000000000000000010 /* Base.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A80000000000000000000001 /* Build configuration list for PBXNativeTarget "RankAndFolder" */ = {isa = XCConfigurationList; buildConfigurations = (AA0000000000000000000001, AA0000000000000000000002,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A80000000000000000000002 /* Build configuration list for PBXNativeTarget "RankAndFolder Finder Extension" */ = {isa = XCConfigurationList; buildConfigurations = (AA0000000000000000000003, AA0000000000000000000004,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		A80000000000000000000003 /* Build configuration list for PBXProject "RankAndFolder" */ = {isa = XCConfigurationList; buildConfigurations = (AA0000000000000000000005, AA0000000000000000000006,); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = A70000000000000000000001 /* Project object */;
+}

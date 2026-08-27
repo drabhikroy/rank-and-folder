@@ -1,0 +1,10 @@
+version: 2
+updates:
+  # The project has no package dependencies. GitHub Actions is the one moving
+  # part, so it is the one thing worth watching.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "ci"
