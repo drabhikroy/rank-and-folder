@@ -1,7 +1,5 @@
 <div align="left">
 
-<img src="Assets/AppIcon.svg" width="128" alt="">
-
 # Rank & Folder
 
 **One Finder. Different rules for every folder.**
