@@ -2,8 +2,6 @@
 
 # Rank & Folder
 
-**One Finder. Different rules for every folder.**
-
 Save a different way to group and sort each folder.
 
 [![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-blue)](LICENSE)
