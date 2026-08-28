@@ -15,7 +15,7 @@ jobs:
     name: Shared core tests
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Select Xcode
         run: sudo xcode-select -switch /Applications/Xcode_16.app
@@ -27,7 +27,7 @@ jobs:
     name: Unsigned app build
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Select Xcode
         run: sudo xcode-select -switch /Applications/Xcode_16.app
@@ -47,7 +47,7 @@ jobs:
     name: House writing rules
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Reject em and en dashes
         run: |

@@ -14,7 +14,7 @@ jobs:
     name: Build and publish
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Select Xcode
         run: sudo xcode-select -switch /Applications/Xcode_16.app
@@ -37,7 +37,7 @@ jobs:
           cat dist/SHA256SUMS.txt
 
       - name: Publish the release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             dist/*.dmg
