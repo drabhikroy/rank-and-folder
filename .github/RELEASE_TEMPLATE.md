@@ -33,7 +33,7 @@ camera, no microphone, no contacts, no calendars, and no location.
 
 ## Install
 
-Download `RankAndFolder-1.0.0.dmg` below, open it, and drag **Rank & Folder**
+Download `RankAndFolder-1.0.1.dmg` below, open it, and drag **Rank & Folder**
 onto the Applications shortcut beside it.
 
 A zip is published alongside it for anyone scripting the download.

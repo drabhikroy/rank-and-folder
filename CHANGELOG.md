@@ -34,6 +34,24 @@ Notable changes to Rank & Folder. Versions follow
 - The application menu title came from the target name and read
   RankAndFolder. It now reads Rank & Folder, and nine strings that referred to
   the app by its internal name have been corrected.
+- The Hide and Quit menu items in the standalone build read
+  $(PRODUCT_DISPLAY_NAME). The build script copies the standalone property list
+  without expanding build variables, so the display name is now written out in
+  full. This affected 1.0.0 as well.
+- In the complete color vision deficiency mode, the colors were fixed dark
+  neutrals. A set that carries no hue can only separate by lightness, so
+  anywhere one was used as a symbol or a label rather than as a fill it
+  disappeared against a dark window. Those colors now follow the appearance,
+  and the label on a filled surface inverts with them.
+- The Hide and Quit menu items in the standalone build read
+  $(PRODUCT_DISPLAY_NAME). The build script copies the standalone property list
+  without expanding build variables, so the display name is now written out in
+  full. This affected 1.0.0 as well.
+- In the complete color vision deficiency mode, the colors were fixed dark
+  neutrals. A set that carries no hue can only separate by lightness, so
+  anywhere one was used as a symbol or a label rather than as a fill it
+  disappeared against a dark window. Those colors now follow the appearance,
+  and the label on a filled surface inverts with them.
 
 ### Changed
 
