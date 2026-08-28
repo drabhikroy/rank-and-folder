@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleDisplayName</key>
-	<string>$(PRODUCT_DISPLAY_NAME)</string>
+	<string>Rank &amp; Folder</string>
 	<key>CFBundleName</key>
 	<string>Rank &amp; Folder</string>
 	<key>CFBundlePackageType</key>
