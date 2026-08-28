@@ -2,6 +2,8 @@ import AppKit
 import CryptoKit
 import Foundation
 
+/// How far an install has got and what it is doing, reported so the window can
+/// show a stage rather than only a spinner.
 struct ManagedRuntimeProgress: Equatable, Sendable {
     enum Phase: String, Sendable {
         case downloading
@@ -15,6 +17,8 @@ struct ManagedRuntimeProgress: Equatable, Sendable {
 }
 
 @MainActor
+/// The copy of Ollama kept inside the app's own support folder. It is separate
+/// from any system wide install, and it is started and stopped by the app.
 final class ManagedOllamaRuntime: ObservableObject {
     enum State: Equatable {
         case checking
@@ -173,6 +177,8 @@ final class ManagedOllamaRuntime: ObservableObject {
     }
 }
 
+/// Every way installing or starting the managed runtime can fail, including the
+/// checks that refuse a download whose checksum or archive contents are wrong.
 enum ManagedRuntimeError: LocalizedError {
     case unsupportedMac
     case invalidDownload
@@ -208,6 +214,8 @@ enum ManagedRuntimeError: LocalizedError {
     }
 }
 
+/// Allows the download to follow a redirect only to the hosts that serve release
+/// assets, so a redirect cannot move the download to an arbitrary server.
 private final class RuntimeDownloadDelegate: NSObject, URLSessionTaskDelegate,
     @unchecked Sendable {
     private let permittedHosts: Set<String> = [

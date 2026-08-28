@@ -1,5 +1,6 @@
 import Foundation
 
+/// Decides which models to recommend for a Mac from its memory and storage.
 enum ModelRecommendationPolicy {
     static let startingModelID = "qwen3:4b"
 
@@ -14,6 +15,8 @@ enum ModelRecommendationPolicy {
     }
 }
 
+/// Works out which models are usable right now from what is installed and what
+/// is already running.
 enum OllamaModelInventoryPolicy {
     static func availableModelIDs(
         installedIDs: Set<String>,
@@ -54,6 +57,8 @@ enum FolderMetadataPromptSanitizer {
     }
 }
 
+/// The shape a model reply has to decode into before it is checked. Decoding
+/// successfully is not enough on its own; the checks below still have to pass.
 private struct GeneratedRecipe: Decodable {
     struct Level: Decodable {
         let criterion: String
@@ -88,6 +93,8 @@ private struct GeneratedRecipe: Decodable {
     }
 }
 
+/// Why a suggestion was refused, either because the reply did not hold a usable
+/// recipe or because the folder could not be read safely.
 enum SuggestionValidationError: LocalizedError {
     case invalidResponse
     case unavailable(String)
@@ -277,6 +284,8 @@ enum SuggestionRecipeValidator {
     }
 }
 
+/// The single test for whether a URL is the local Ollama endpoint. Everything
+/// else is refused, which is what keeps the connection on this Mac.
 enum OllamaLoopbackPolicy {
     static func isExactLoopbackURL(_ url: URL) -> Bool {
         url.scheme == "http"
@@ -292,6 +301,7 @@ enum OllamaLoopbackPolicy {
     }
 }
 
+/// One progress line from a model download.
 struct OllamaPullEvent: Equatable, Sendable {
     let fraction: Double?
     let status: String

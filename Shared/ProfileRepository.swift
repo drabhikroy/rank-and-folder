@@ -1,5 +1,6 @@
 import Foundation
 
+/// The two ways reading or writing the stored layouts can fail.
 public enum ProfileRepositoryError: LocalizedError {
     case encodingFailed(Error)
     case decodingFailed(Error)

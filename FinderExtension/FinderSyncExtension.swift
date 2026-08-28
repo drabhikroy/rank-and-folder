@@ -1,6 +1,7 @@
 import AppKit
 import FinderSync
 
+/// Holds the extension weakly so a registered callback does not keep it alive.
 private final class WeakFinderSyncReference: @unchecked Sendable {
     weak var value: FinderSyncExtension?
 
@@ -9,6 +10,8 @@ private final class WeakFinderSyncReference: @unchecked Sendable {
     }
 }
 
+/// The optional Finder menu item. It reads the saved layouts and queues a
+/// request for the app to act on. The extension never drives Finder itself.
 final class FinderSyncExtension: FIFinderSync {
     private let repository = UserDefaultsProfileRepository()
     private let requestQueue = ApplyRequestQueue()

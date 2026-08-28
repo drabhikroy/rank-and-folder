@@ -1,5 +1,8 @@
 import Foundation
 
+/// One request from the Finder extension asking the app to apply a folder's
+/// layout. The path is normalized on the way in so two spellings of the same
+/// folder do not queue twice.
 public struct ApplyRequest: Codable, Equatable, Sendable {
     public var folderPath: String
     public var requestedAt: Date

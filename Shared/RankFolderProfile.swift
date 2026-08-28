@@ -2,6 +2,8 @@ import Foundation
 
 // MARK: - Finder's supported controls
 
+/// The grouping choices Finder itself offers. A recipe is reproducible in Finder
+/// only when its first section rule maps onto one of these.
 public enum GroupCriterion: String, Codable, CaseIterable, Identifiable, Sendable {
     case none
     case name
@@ -39,6 +41,8 @@ public enum GroupCriterion: String, Codable, CaseIterable, Identifiable, Sendabl
     }
 }
 
+/// The sorting choices Finder itself offers, used the same way as the grouping
+/// choices above.
 public enum SortCriterion: String, Codable, CaseIterable, Identifiable, Sendable {
     case name
     case kind
@@ -74,6 +78,9 @@ public enum SortCriterion: String, Codable, CaseIterable, Identifiable, Sendable
 
 // MARK: - One canonical organization recipe
 
+/// Everything a level can be built on, including the criteria Finder has no
+/// control for. Those extra ones are why a recipe can go deeper than Finder can
+/// reproduce.
 public enum AdvancedCriterion: String, Codable, CaseIterable, Identifiable, Sendable {
     case name
     case kind
@@ -156,6 +163,8 @@ public enum AdvancedCriterion: String, Codable, CaseIterable, Identifiable, Send
     }
 }
 
+/// Which way a level runs when the person chooses rather than leaving the
+/// criterion to decide.
 public enum AdvancedSortDirection: String, Codable, CaseIterable, Identifiable, Sendable {
     case ascending
     case descending
@@ -182,6 +191,7 @@ public enum AdvancedSortDirection: String, Codable, CaseIterable, Identifiable, 
     }
 }
 
+/// One level of a recipe: what it is built on and which way it runs.
 public struct OrganizationLevel: Codable, Identifiable, Equatable, Sendable {
     public var id: UUID
     public var criterion: AdvancedCriterion
@@ -199,6 +209,8 @@ public struct OrganizationLevel: Codable, Identifiable, Equatable, Sendable {
     }
 }
 
+/// A whole saved layout. Sections split a folder into headings and item order
+/// decides what comes first inside the smallest section, each up to seven levels.
 public struct OrganizationRecipe: Codable, Equatable, Sendable {
     public static let maximumLevelsPerArea = 7
 
@@ -221,11 +233,14 @@ public struct OrganizationRecipe: Codable, Equatable, Sendable {
     public var allLevels: [OrganizationLevel] { sections + itemOrder }
 }
 
+/// The one grouping rule and one sorting rule Finder can actually be set to,
+/// derived from a recipe when the recipe is shallow enough.
 public struct FinderRecipeRepresentation: Equatable, Sendable {
     public var groupBy: GroupCriterion
     public var sortBy: SortCriterion
 }
 
+/// How far a saved layout reaches beyond the folder it was saved for.
 public enum ProfileDescendantScope: String, Codable, CaseIterable, Sendable {
     /// Apply the recipe only when Finder is showing the saved folder itself.
     case exactFolder
@@ -235,16 +250,20 @@ public enum ProfileDescendantScope: String, Codable, CaseIterable, Sendable {
 
 // MARK: - Stored schema compatibility
 
+/// Whether a recipe is shallow enough for Finder, or can only be shown as a
+/// preview inside the app.
 public enum RecipeMode: String, Codable, Sendable {
     case finder
     case advanced
 }
 
+/// Whether a rule creates headings or orders rows.
 public enum AdvancedRuleBehavior: String, Codable, Sendable {
     case group
     case sort
 }
 
+/// One rule of a flattened recipe, in the form the preview builder consumes.
 public struct AdvancedViewRule: Codable, Identifiable, Equatable, Sendable {
     public var id: UUID
     public var behavior: AdvancedRuleBehavior
@@ -673,6 +692,8 @@ public struct RankFolderProfile: Codable, Identifiable, Equatable, Sendable {
     }
 }
 
+/// Every reason a chosen folder cannot be saved, such as a file rather than a
+/// folder, a package, or a location that is not on this Mac.
 public enum FolderReferenceError: Error, Equatable, Sendable {
     case notFileURL
     case remoteFileURL

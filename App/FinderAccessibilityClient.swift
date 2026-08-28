@@ -2,6 +2,8 @@ import AppKit
 import ApplicationServices
 import Foundation
 
+/// Every way driving Finder can fail. Each case carries a message that says what
+/// to do next rather than only what went wrong.
 enum FinderAccessibilityError: LocalizedError {
     case permissionRequired
     case finderNotRunning
@@ -50,11 +52,14 @@ enum FinderAccessibilityError: LocalizedError {
     }
 }
 
+/// How a Finder window is confirmed to be showing the folder a layout is meant
+/// for. An explicit open is trusted only by title and only until it expires.
 enum FinderFolderVerification {
     case exactLocation
     case explicitOpen(expectedTitle: String, validUntil: Date)
 }
 
+/// Which of the two checks confirmed the window.
 enum FinderVerificationOutcome {
     case exactLocation
     case explicitOpenTitle

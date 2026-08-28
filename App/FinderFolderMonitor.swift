@@ -1,6 +1,8 @@
 import Combine
 import Foundation
 
+/// Holds the monitor weakly so a callback registered with the system does not
+/// keep it alive after it is no longer needed.
 private final class WeakFinderFolderMonitorReference: @unchecked Sendable {
     weak var value: FinderFolderMonitor?
 

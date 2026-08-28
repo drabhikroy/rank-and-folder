@@ -1,6 +1,8 @@
 import FileProvider
 import Foundation
 
+/// Where a folder physically lives, which decides whether a layout is allowed to
+/// reach into it from a parent.
 public enum FolderProviderLocation: Equatable, Sendable {
     case local
     case domain(String)
@@ -9,6 +11,9 @@ public enum FolderProviderLocation: Equatable, Sendable {
     case unknown
 }
 
+/// Everything known about a folder that is on disk right now. A folder is
+/// identified by these rather than by its path text, so a folder deleted and
+/// recreated at the same path is treated as a different folder.
 public struct ResolvedFolderIdentity: Equatable, Sendable {
     public let canonicalURL: URL
     public let bookmarkData: Data
@@ -44,6 +49,8 @@ public struct ResolvedFolderIdentity: Equatable, Sendable {
     }
 }
 
+/// What was written down about a folder when it was saved, checked against the
+/// folder that is there now.
 public struct StoredFolderReference: Equatable, Sendable {
     public let folderPath: String
     public let bookmarkData: Data?
@@ -76,6 +83,8 @@ public struct StoredFolderReference: Equatable, Sendable {
     }
 }
 
+/// Every reason a stored reference cannot be confirmed against a live folder.
+/// Any of them stops a layout rather than letting it apply on a guess.
 public enum FolderReferenceIssue: Error, Equatable, Sendable {
     case invalidTarget
     case bookmarkMissing
@@ -88,6 +97,8 @@ public enum FolderReferenceIssue: Error, Equatable, Sendable {
     case providerUnavailable
 }
 
+/// How a live folder relates to a saved one. Only a confirmed ancestor lets a
+/// layout be inherited; anything uncertain stops instead.
 public enum FolderReferenceRelationship: Equatable, Sendable {
     case same
     case ancestor(distance: Int)

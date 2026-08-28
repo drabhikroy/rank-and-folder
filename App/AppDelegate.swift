@@ -1,6 +1,8 @@
 import AppKit
 
 @MainActor
+/// Handles the parts of the application lifecycle SwiftUI does not cover, in
+/// particular listening for apply requests sent by the Finder extension.
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var applyObserver: DarwinNotificationObserver?
 

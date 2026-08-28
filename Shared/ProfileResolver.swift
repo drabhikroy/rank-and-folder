@@ -1,5 +1,7 @@
 import Foundation
 
+/// Which saved layout was used and when it last changed, so a pending apply can
+/// be abandoned if the layout changed underneath it.
 public struct FolderProfileRevision: Equatable, Sendable {
     public let profileID: UUID
     public let updatedAt: Date
@@ -10,6 +12,8 @@ public struct FolderProfileRevision: Equatable, Sendable {
     }
 }
 
+/// The layout that applies to one folder, and whether it was saved for that
+/// folder or inherited from a parent.
 public struct ResolvedFolderLayout: Equatable, Sendable {
     public enum Origin: Equatable, Sendable {
         case exact
@@ -39,6 +43,8 @@ public struct ResolvedFolderLayout: Equatable, Sendable {
     }
 }
 
+/// Why no layout was applied. Each case names the specific thing that stopped
+/// it, so the app can say which folder or which mark is responsible.
 public enum FolderResolutionBlockReason: Equatable, Sendable {
     case targetUnavailable(FolderReferenceIssue)
     case disabledProfile(UUID)
@@ -48,6 +54,8 @@ public enum FolderResolutionBlockReason: Equatable, Sendable {
     case duplicateProfiles([UUID])
 }
 
+/// The three possible answers for a folder: a layout applies, something stopped
+/// one from applying, or none was ever saved for it.
 public enum FolderLayoutResolution: Equatable, Sendable {
     case resolved(ResolvedFolderLayout)
     case blocked(FolderResolutionBlockReason)

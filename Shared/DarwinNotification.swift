@@ -17,6 +17,8 @@ public enum DarwinNotification {
     }
 }
 
+/// Listens for a system wide notification. The app and its Finder extension are
+/// separate processes, so this is how one tells the other that something changed.
 public final class DarwinNotificationObserver {
     private let name: String
     private let handler: () -> Void

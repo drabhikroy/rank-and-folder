@@ -1,5 +1,6 @@
 import Foundation
 
+/// The two ways reading or writing the stored boundaries can fail.
 public enum BoundaryRepositoryError: LocalizedError {
     case encodingFailed(Error)
     case decodingFailed(Error)

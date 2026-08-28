@@ -2,6 +2,8 @@ import Foundation
 import Combine
 
 @MainActor
+/// The single instance of each long-lived object, built once at launch so every
+/// window works against the same store and the same coordinator.
 final class AppServices {
     static let shared = AppServices()
 
@@ -47,6 +49,8 @@ final class SecondaryWindowStore: ObservableObject {
     private init() {}
 }
 
+/// The two notifications a secondary window sends to ask the main window to
+/// change what it is showing.
 extension Notification.Name {
     static let rankFolderSelectProfile = Notification.Name("RankFolderSelectProfile")
     static let rankFolderShowPreview = Notification.Name("RankFolderShowPreview")

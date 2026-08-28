@@ -1,5 +1,7 @@
 import ApplicationServices
 
+/// Reports whether macOS has approved this copy of the app for Accessibility,
+/// and opens the System Settings pane where the person can grant it.
 enum AccessibilityPermission {
     static var isGranted: Bool {
         AXIsProcessTrusted()

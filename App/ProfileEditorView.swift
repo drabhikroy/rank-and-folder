@@ -1,6 +1,9 @@
 import AppKit
 import SwiftUI
 
+/// The editor for one saved folder. It moves through building the layout,
+/// choosing how far the layout reaches into subfolders, and choosing whether
+/// Finder is driven automatically.
 struct ProfileEditorView: View {
     @Environment(\.rankFolderColorVisionMode) private var colorVisionMode
     @Environment(\.rankFolderPanelSpacing) private var panelSpacing
@@ -991,6 +994,7 @@ struct ProfileEditorView: View {
     }
 }
 
+/// The two panels below the layout editor, shown one at a time.
 private enum ProfileEditorPanel: String, CaseIterable, Identifiable {
     case subfolders
     case finder
@@ -1012,6 +1016,9 @@ private enum ProfileEditorPanel: String, CaseIterable, Identifiable {
     }
 }
 
+/// The three steps of building a layout. Sections split the folder into
+/// headings, item order decides what comes first inside the smallest section,
+/// and preview shows the result without touching Finder.
 private enum LayoutEditorStage: String, CaseIterable, Identifiable {
     case sections
     case itemOrder
@@ -1036,6 +1043,8 @@ private enum LayoutEditorStage: String, CaseIterable, Identifiable {
     }
 }
 
+/// A numbered heading for one step of the editor, with a short line saying what
+/// the step is for.
 private struct WorkflowStepHeader: View {
     let number: Int
     let title: String
@@ -1059,6 +1068,8 @@ private struct WorkflowStepHeader: View {
     }
 }
 
+/// A small read-only preview of how a folder would look under a recipe. It
+/// reads folder metadata only and never opens or changes a file.
 struct CompactFolderPreview: View {
     let profile: RankFolderProfile
     let recipe: OrganizationRecipe?
@@ -1184,6 +1195,8 @@ struct CompactFolderPreview: View {
     }
 }
 
+/// One reversible change to how far a layout reaches, held so the person can
+/// undo it from the message that reports it.
 private struct ScopeUndo {
     enum Operation {
         case restoreScope(ProfileDescendantScope)
@@ -1195,6 +1208,8 @@ private struct ScopeUndo {
     let undoHint: String
 }
 
+/// The editable list of levels for one half of a recipe. Sections and item
+/// order both use it, which is why the labels are passed in.
 private struct RecipeArea: View {
     let emptyText: String
     let addTitle: String
@@ -1254,6 +1269,8 @@ private struct RecipeArea: View {
     }
 }
 
+/// One level in a recipe, with its criterion, its direction, and the controls
+/// that move or remove it.
 private struct OrganizationLevelRow: View {
     let number: Int
     let label: String
@@ -1371,6 +1388,8 @@ private struct OrganizationLevelRow: View {
     }
 }
 
+/// The direction shown for one level. Standard means the criterion decides its
+/// own direction rather than the person choosing one.
 private enum DirectionChoice: String, Hashable {
     case standard
     case ascending
