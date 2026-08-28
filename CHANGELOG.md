@@ -3,6 +3,44 @@
 Notable changes to Rank & Folder. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Dates are ISO 8601.
 
+## [1.0.1] - 2026-08-27
+
+### Fixed
+
+- The color vision choice now selects the colors the whole interface fills
+  with, not only the four status colors. It previously changed status
+  indicators alone, so the two most prominent buttons on the home screen stayed
+  jade and coral in every mode. Those two separate by 0.221 under a
+  deuteranopia simulation and 0.114 under protanopia, close enough that a
+  person with red-green color vision deficiency could not reliably tell them
+  apart. The red-green and blue-yellow sets have been rebuilt around pairs that
+  survive their own simulation, and every fill clears 4.5 to 1 against white.
+- In the complete color vision deficiency mode, a filled status circle used the
+  primary label color while its symbol stayed white, so the symbol disappeared
+  in dark appearance. Filled status surfaces now use a label color that inverts
+  with the appearance.
+- The paired toolbar buttons used a material that samples the window behind it
+  and rendered as a grey slab in light appearance. They now use the control
+  background color.
+- Two card outlines were white at low opacity and were invisible against a
+  light background. The home screen introduction has been rebuilt so its wash
+  sits over an opaque card rather than tinting one.
+- The add and remove controls at the foot of the sidebar showed a symbol and a
+  word each with no separation, so the row read as one phrase. They are now a
+  grouped pair of symbol buttons, with the words on the tooltip and the
+  accessibility label.
+- The local model card filled its button with the danger color. An optional
+  setup step no longer looks destructive.
+- The application menu title came from the target name and read
+  RankAndFolder. It now reads Rank & Folder, and nine strings that referred to
+  the app by its internal name have been corrected.
+
+### Changed
+
+- The Appearance settings preview shows the fills as well as the status colors,
+  so a mode can be judged from the colors themselves.
+- Every type in the source carries a comment saying what it is for.
+
 ## [1.0.0] - 2026-08-27
 
 First public release.
@@ -48,4 +86,5 @@ First public release.
 - The app never moves, renames, or deletes files, and never reads file contents.
 - Requires macOS 14 or later.
 
+[1.0.1]: https://github.com/drabhikroy/rank-and-folder/releases/tag/v1.0.1
 [1.0.0]: https://github.com/drabhikroy/rank-and-folder/releases/tag/v1.0.0

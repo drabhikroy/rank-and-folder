@@ -61,6 +61,39 @@ Important checks include:
 - progress, success, warning, and failure use both words and symbols;
 - changing appearance updates every open window.
 
+### Color
+
+The interface fills with a fixed set of colors rather than the system accent.
+The system accent is chosen in System Settings and can be a light hue such as
+yellow, which would drop a white label below the AA body ratio wherever the app
+fills a control with it.
+
+The color vision choice selects the whole set, not only the status colors. This
+matters because the two most prominent buttons on the home screen are the
+primary action and the local model action. In the standard set those are jade
+and coral, and under a dichromacy simulation they separate by 0.221 for
+deuteranopia and 0.114 for protanopia, on a scale where roughly 0.28 is the
+floor for telling two fills apart. A person with red-green color vision
+deficiency could not reliably tell the two apart while the interface used one
+fixed set, which is why choosing a mode now repaints the app.
+
+Each set is checked two ways. Every fill clears 4.5 to 1 against white, and
+every pair of fills is run through a Vienot dichromacy simulation for the
+deficiency the set is meant for.
+
+| Set | Fills | White on the lightest fill | Worst pair after simulation |
+| --- | --- | --- | --- |
+| Standard | jade, coral, plum | 4.93 | not applicable |
+| Red-green | blue, amber, dark navy | 4.55 | 0.285 |
+| Blue-yellow | teal, crimson, dark maroon | 5.94 | 0.434 |
+| Complete | three neutrals | 5.54 | separated by lightness only |
+
+Two limits are worth stating plainly. Under tritanopia, warning and danger both
+fall in the warm range and separate by lightness rather than by hue. Under
+complete deficiency there is no hue at all. In both cases the word and the
+symbol beside the color carry the meaning, which is why no status is ever shown
+as color alone.
+
 ## Model presentation
 
 Models are explicitly optional. The setup page first asks where Ollama runs, then checks the service, then shows supported model cards. Cards in a row share height and state why a model may help specifically with Rank & Folder.
