@@ -854,7 +854,7 @@ private struct HomeView: View {
             title: "Local model",
             detail: localModelStatus,
             icon: "cpu",
-            tint: RankFolderPalette.plum,
+            tint: RankFolderPalette.coral,
             buttonTitle: "Choose model setup",
             action: showModels
         )

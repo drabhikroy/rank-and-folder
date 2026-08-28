@@ -63,7 +63,7 @@ enum RankFolderPalette {
             RankFolderPaletteTokens(
                 action: Color(red: 0.03, green: 0.43, blue: 0.38),
                 actionPressed: Color(red: 0.02, green: 0.34, blue: 0.31),
-                coral: Color(red: 0.79, green: 0.24, blue: 0.28),
+                coral: Color(red: 0.68, green: 0.26, blue: 0.20),
                 plum: Color(red: 0.39, green: 0.20, blue: 0.46),
                 amber: Color(red: 0.60, green: 0.39, blue: 0.02)
             )

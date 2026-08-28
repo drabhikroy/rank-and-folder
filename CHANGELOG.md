@@ -3,6 +3,17 @@
 Notable changes to Rank & Folder. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Dates are ISO 8601.
 
+## [1.0.2] - 2026-08-28
+
+### Changed
+
+- The local model card fills its button with red again. It was changed to plum
+  in 1.0.1 on the reasoning that red reads as destructive, but plum sits close
+  to the window background in dark appearance and was harder to see. The red is
+  now a deeper brick rather than the shade the app reports failures in, so an
+  optional setup step and an error no longer look alike. The status colors have
+  their own values and are not affected.
+
 ## [1.0.1] - 2026-08-27
 
 ### Fixed
@@ -104,5 +115,6 @@ First public release.
 - The app never moves, renames, or deletes files, and never reads file contents.
 - Requires macOS 14 or later.
 
+[1.0.2]: https://github.com/drabhikroy/rank-and-folder/releases/tag/v1.0.2
 [1.0.1]: https://github.com/drabhikroy/rank-and-folder/releases/tag/v1.0.1
 [1.0.0]: https://github.com/drabhikroy/rank-and-folder/releases/tag/v1.0.0
