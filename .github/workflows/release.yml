@@ -47,6 +47,12 @@ jobs:
           ls -lh dist
           cat dist/SHA256SUMS.txt
 
+      # The notes are built from this version's changelog section, so a release
+      # says what changed in it rather than repeating the description of the
+      # app that every release shares.
+      - name: Build the release notes
+        run: ./Scripts/release-notes.sh > "$RUNNER_TEMP/release-notes.md"
+
       - name: Publish the release
         uses: softprops/action-gh-release@v3
         with:
@@ -54,5 +60,5 @@ jobs:
             dist/*.dmg
             dist/*.zip
             dist/SHA256SUMS.txt
-          body_path: .github/RELEASE_TEMPLATE.md
+          body_path: ${{ runner.temp }}/release-notes.md
           draft: true

@@ -1,7 +1,7 @@
 Rank & Folder gives each folder you save its own layout, so changing how your
 downloads are arranged does not change how your invoices are arranged.
 
-## What is in this release
+## What the app does
 
 **Saved layouts.** A layout has two parts. Sections split a folder into
 headings, and Item Order decides what comes first inside the smallest section.
@@ -33,7 +33,7 @@ camera, no microphone, no contacts, no calendars, and no location.
 
 ## Install
 
-Download `RankAndFolder-1.0.2.dmg` below, open it, and drag **Rank & Folder**
+Download `RankAndFolder-VERSION.dmg` below, open it, and drag **Rank & Folder**
 onto the Applications shortcut beside it.
 
 A zip is published alongside it for anyone scripting the download.
