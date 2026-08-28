@@ -2,6 +2,9 @@ import AppKit
 import Combine
 import SwiftUI
 
+/// The main window. A sidebar lists every saved folder and every folder marked
+/// as left alone, and the detail side shows the home screen, one folder's
+/// layout editor, or one boundary.
 struct ContentView: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(\.rankFolderPanelSpacing) private var panelSpacing
@@ -216,10 +219,15 @@ struct ContentView: View {
         .navigationSplitViewColumnWidth(min: 285, ideal: sidebarPreferredWidth, max: 420)
         .safeAreaInset(edge: .bottom) {
             VStack(spacing: 6 * panelSpacing) {
-                HStack(spacing: 4) {
+                // Icon and word ran together across the two buttons, so the row
+                // read as one phrase rather than as two controls. Each button
+                // now shows only its symbol, the pair is boxed as a group the
+                // way a source list footer is on this platform, and the words
+                // stay on the tooltip and the accessibility label.
+                HStack(spacing: 0) {
                     Button(action: addFolder) {
-                        Label("Add", systemImage: "plus")
-                            .frame(minWidth: 48, minHeight: 26)
+                        Image(systemName: "plus")
+                            .frame(width: 30, height: 24)
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.borderless)
@@ -227,9 +235,11 @@ struct ContentView: View {
                     .help("Add a folder")
                     .accessibilityLabel("Add a folder")
 
+                    Divider().frame(height: 16)
+
                     Button(action: requestSelectedRemoval) {
-                        Label("Remove", systemImage: "minus")
-                            .frame(minWidth: 66, minHeight: 26)
+                        Image(systemName: "minus")
+                            .frame(width: 30, height: 24)
                             .contentShape(Rectangle())
                     }
                     .buttonStyle(.borderless)
@@ -237,9 +247,12 @@ struct ContentView: View {
                     .help(removeButtonHelp)
                     .accessibilityLabel(removeButtonLabel)
                     .accessibilityHint("Shows a confirmation before changing Rank & Folder’s saved choices.")
-
-                    Spacer(minLength: 8)
                 }
+                .overlay {
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .stroke(Color.primary.opacity(0.14), lineWidth: 1)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
 
                 Divider()
 
@@ -450,6 +463,9 @@ struct ContentView: View {
     }
 }
 
+/// Groups a pair of toolbar buttons into one rounded control, so the two work
+/// actions and the two application actions read as two groups rather than four
+/// loose buttons.
 private struct ToolbarActionBubble<Content: View>: View {
     @ViewBuilder let content: () -> Content
 
@@ -461,20 +477,28 @@ private struct ToolbarActionBubble<Content: View>: View {
         .labelStyle(.iconOnly)
         .padding(.horizontal, 4)
         .padding(.vertical, 3)
-        .background(.regularMaterial, in: Capsule())
+        // A material here samples the window behind it and renders as a grey
+        // slab in light appearance, which reads as a disabled control. The
+        // control background color stays close to the toolbar in both
+        // appearances, so the capsule reads as a grouped control instead.
+        .background(Color(nsColor: .controlBackgroundColor).opacity(0.9), in: Capsule())
         .overlay {
-            Capsule().stroke(Color.primary.opacity(0.14), lineWidth: 1)
+            Capsule().stroke(Color.primary.opacity(0.12), lineWidth: 1)
         }
-        .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
     }
 }
 
+/// What the sidebar currently has selected. Profiles and boundaries are both
+/// identified by their own identifier, so a selection survives the list being
+/// resorted.
 private enum SidebarSelection: Hashable {
     case home
     case profile(UUID)
     case boundary(UUID)
 }
 
+/// The sidebar heading a saved folder is filed under, decided from where the
+/// folder lives rather than from anything the person chose.
 private enum FolderLocationGroup: Int, CaseIterable, Identifiable {
     case onMyMac
     case iCloudDrive
@@ -517,6 +541,8 @@ private enum FolderLocationGroup: Int, CaseIterable, Identifiable {
     }
 }
 
+/// The item a removal confirmation is currently asking about. Nil means no
+/// confirmation is showing.
 private enum PendingRemoval: Equatable {
     case profile(UUID)
     case boundary(UUID)
@@ -529,7 +555,7 @@ enum FolderProfileCreationCoordinator {
     static func chooseAndAdd(to store: ProfileStore) async -> UUID? {
         let panel = NSOpenPanel()
         panel.title = "Choose a Folder"
-        panel.message = "Rank & Folder will save a layout for this folder. If it already uses a layout from another folder, RankFolder starts with a separate copy you can edit. Your files will not be changed."
+        panel.message = "Rank & Folder will save a layout for this folder. If it already uses a layout from another folder, Rank & Folder starts with a separate copy you can edit. Your files will not be changed."
         panel.prompt = "Add folder"
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
@@ -546,6 +572,8 @@ enum FolderProfileCreationCoordinator {
     }
 }
 
+/// One saved folder in the sidebar, showing its name, where it lives, and
+/// whether its layout is paused.
 private struct ProfileRow: View {
     let profile: RankFolderProfile
 
@@ -596,6 +624,8 @@ private struct ProfileRow: View {
     }
 }
 
+/// One folder marked as left alone in the sidebar. These are listed separately
+/// from saved folders because they carry no layout of their own.
 private struct BoundaryRow: View {
     let boundary: FolderInheritanceBoundary
 
@@ -630,6 +660,8 @@ private struct BoundaryRow: View {
     }
 }
 
+/// The detail side for a folder marked as left alone. It explains what the mark
+/// does and offers the one action that removes it.
 private struct BoundaryDetailView: View {
     let boundary: FolderInheritanceBoundary
     let allowLayoutsAgain: () -> Void
@@ -694,6 +726,8 @@ private struct BoundaryDetailView: View {
     }
 }
 
+/// The detail side when nothing is selected. It carries the introduction, the
+/// two starting choices, and a short list of saved folders.
 private struct HomeView: View {
     @Environment(\.rankFolderColorVisionMode) private var colorVisionMode
     @ObservedObject private var modelAvailability = ModelCenterViewModel.shared
@@ -747,21 +781,28 @@ private struct HomeView: View {
             }
         }
         .padding(28)
-        .background(
-            LinearGradient(
-                colors: [
-                    RankFolderPalette.action.opacity(0.20),
-                    RankFolderPalette.coral.opacity(0.10),
-                    Color(nsColor: .controlBackgroundColor).opacity(0.84)
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            ),
-            in: RoundedRectangle(cornerRadius: 24, style: .continuous)
-        )
+        .background {
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .fill(Color(nsColor: .controlBackgroundColor))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 24, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    RankFolderPalette.action.opacity(0.14),
+                                    RankFolderPalette.coral.opacity(0.07),
+                                    Color.clear
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                }
+        }
+
         .overlay {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(Color.white.opacity(0.10), lineWidth: 1)
+                .stroke(Color.primary.opacity(0.08), lineWidth: 1)
         }
     }
 
@@ -813,7 +854,7 @@ private struct HomeView: View {
             title: "Local model",
             detail: localModelStatus,
             icon: "cpu",
-            tint: RankFolderPalette.coral,
+            tint: RankFolderPalette.plum,
             buttonTitle: "Choose model setup",
             action: showModels
         )
@@ -894,6 +935,8 @@ private struct HomeView: View {
     }
 }
 
+/// One of the two starting choices on the home screen. The whole card is the
+/// button; the capsule inside it is the visible target.
 private struct HomeChoiceCard: View {
     let eyebrow: String
     let title: String
@@ -949,6 +992,8 @@ private struct HomeChoiceCard: View {
     }
 }
 
+/// A drawing of two stacked folder cards beside the introduction. It shows no
+/// real data and is hidden from assistive technology.
 private struct FolderLayoutIllustration: View {
     var body: some View {
         ZStack {
@@ -980,6 +1025,8 @@ private struct FolderLayoutIllustration: View {
     }
 }
 
+/// The detail side when the sidebar selection points at a folder that is no
+/// longer there.
 private struct SelectProfileView: View {
     var body: some View {
         ContentUnavailableView {
