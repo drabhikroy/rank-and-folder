@@ -2,6 +2,8 @@ import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
+/// The full preview window. It shows every saved level of a layout, including
+/// the levels Finder cannot reproduce.
 struct AdvancedFolderPreview: View {
     let resolution: ResolvedFolderLayout
 
@@ -166,6 +168,8 @@ struct AdvancedFolderPreview: View {
     }
 }
 
+/// Draws a folder as grouped and sorted rows in a list, the way Finder would
+/// show it if Finder could show every level.
 struct FinderColumnPreview: View {
     let folderName: String
     let items: [AdvancedFolderItem]
@@ -343,6 +347,7 @@ struct FinderColumnPreview: View {
     }
 }
 
+/// One rendered row, which is either a group heading or an item.
 private struct FinderColumnPreviewLine: Identifiable {
     enum Content {
         case group(String)
@@ -354,6 +359,8 @@ private struct FinderColumnPreviewLine: Identifiable {
     let content: Content
 }
 
+/// The metadata read for one item in a folder. These are the same attributes
+/// Finder already shows in a list view. File contents are never read.
 struct AdvancedFolderItem: Identifiable, Sendable {
     let url: URL
     let name: String
@@ -388,13 +395,15 @@ struct AdvancedFolderItem: Identifiable, Sendable {
     }
 }
 
+/// Reads the items of a folder after confirming the folder is still the one that
+/// was verified, so a folder swapped underneath the app is not read by mistake.
 enum AdvancedFolderLoader {
     static func load(resolution: ResolvedFolderLayout) throws -> [AdvancedFolderItem] {
         guard resolution.targetIdentity.matchesLiveFolderURL(
             resolution.targetFolderURL
         ) else {
             throw SuggestionValidationError.unavailable(
-                "This folder changed after Rank & Folder verified it. Close this view and open it again before RankFolder reads its metadata."
+                "This folder changed after Rank & Folder verified it. Close this view and open it again before Rank & Folder reads its metadata."
             )
         }
         let folderURL = resolution.targetFolderURL
@@ -440,6 +449,7 @@ enum AdvancedFolderLoader {
     }
 }
 
+/// One node of the grouped tree, either a heading with a count or a single item.
 struct AdvancedDisplayNode: Identifiable {
     enum Content {
         case group(title: String, count: Int)
@@ -451,6 +461,8 @@ struct AdvancedDisplayNode: Identifiable {
     let children: [AdvancedDisplayNode]?
 }
 
+/// Turns a flat list of items and a list of rules into the nested tree the
+/// preview draws.
 enum AdvancedHierarchyBuilder {
     private struct BucketKey: Hashable {
         let label: String

@@ -1,6 +1,8 @@
 import AppKit
 import SwiftUI
 
+/// Whether layout suggestions come from a local model or are turned off. Off is
+/// the starting value, and the app is fully usable in it.
 enum SuggestionMethod: String, CaseIterable, Identifiable {
     case ollama
     case off
@@ -31,6 +33,8 @@ enum SuggestionMethod: String, CaseIterable, Identifiable {
     }
 }
 
+/// Whether the Ollama runtime is the copy the app installs and manages inside
+/// its own support folder, or one the person installed themselves.
 enum OllamaSetupStyle: String, CaseIterable, Identifiable {
     case rankFolder
     case terminal
@@ -46,6 +50,9 @@ enum OllamaSetupStyle: String, CaseIterable, Identifiable {
 }
 
 @MainActor
+/// Holds what the person has already been shown and what they chose during the
+/// tour. The stored version number is what decides whether the tour opens again
+/// after an update.
 final class OnboardingStore: ObservableObject {
     static let currentVersion = 5
 
@@ -124,6 +131,9 @@ final class OnboardingStore: ObservableObject {
     }
 }
 
+/// The first-run tour. It introduces the app, explains what a layout is, and
+/// asks the two questions that have a lasting effect: how far layouts reach into
+/// subfolders, and whether a local model is used.
 struct WalkthroughView: View {
     @Environment(\.dismissWindow) private var dismissWindow
     @Environment(\.openWindow) private var openWindow
@@ -481,6 +491,7 @@ struct WalkthroughView: View {
     }
 }
 
+/// The pages of the tour, in the order they are shown.
 private enum TourPage: Hashable {
     case welcome
     case language
@@ -490,6 +501,8 @@ private enum TourPage: Hashable {
     case privacy
 }
 
+/// The frame every tour page sits in, holding the heading and moving
+/// keyboard focus to it when the page changes.
 private struct TourCard<Content: View>: View {
     let icon: String
     let title: String
@@ -559,6 +572,7 @@ private struct TourCard<Content: View>: View {
     }
 }
 
+/// One symbol, title, and line of explanation inside a tour page.
 private struct TourFeature: View {
     let icon: String
     let title: String
@@ -585,6 +599,8 @@ private struct TourFeature: View {
     }
 }
 
+/// The content of one tour feature, kept separate from the view so a page can
+/// pass a list of them.
 private struct TourFeatureContent: Identifiable {
     let icon: String
     let title: String
@@ -593,6 +609,8 @@ private struct TourFeatureContent: Identifiable {
     var id: String { title }
 }
 
+/// Lays a list of tour features out in a column or a grid depending on the space
+/// available.
 private struct AdaptiveTourFeatures: View {
     let features: [TourFeatureContent]
 
@@ -616,6 +634,8 @@ private struct AdaptiveTourFeatures: View {
     }
 }
 
+/// A numbered explanation block used where a tour page has to walk through more
+/// than one idea.
 private struct ExplanationPanel: View {
     let number: Int
     let icon: String
@@ -640,6 +660,8 @@ private struct ExplanationPanel: View {
     }
 }
 
+/// One selectable answer to the local model question, showing what the choice
+/// means rather than only its name.
 private struct TourChoiceRow: View {
     let method: SuggestionMethod
     let isSelected: Bool
@@ -697,6 +719,7 @@ private struct TourChoiceRow: View {
     }
 }
 
+/// One line of the tour's statement about what the app does and does not read.
 private struct PrivacyLine: View {
     let icon: String
     let text: String
@@ -721,6 +744,8 @@ private struct PrivacyLine: View {
     }
 }
 
+/// The optional agreement to read this Mac's memory and storage figures, used
+/// only to say which downloadable models would fit.
 private struct CompatibilityConsent: View {
     @ObservedObject var onboarding: OnboardingStore
 
@@ -741,6 +766,7 @@ private struct CompatibilityConsent: View {
 
 // MARK: - Help Center
 
+/// The help window. Topics are listed on the left and searched by their text.
 struct RankFolderHelpView: View {
     @Environment(\.openWindow) private var openWindow
     @EnvironmentObject private var onboarding: OnboardingStore
@@ -794,6 +820,7 @@ struct RankFolderHelpView: View {
     }
 }
 
+/// The help topics, each carrying its own title, symbol, and searchable text.
 private enum HelpTopic: String, CaseIterable, Identifiable {
     case quickStart
     case sectionsAndOrder
@@ -854,6 +881,7 @@ private enum HelpTopic: String, CaseIterable, Identifiable {
     }
 }
 
+/// Draws one help topic from the pieces below.
 private struct HelpTopicView: View {
     let topic: HelpTopic
 
@@ -951,7 +979,7 @@ private struct HelpTopicView: View {
         case .appearance:
             HelpIntro("Rank & Folder can follow your Mac or use a light or dark appearance. Text size and color vision support are separate choices.")
             HelpSteps(steps: [
-                ("Open Appearance", "Click the Settings button in the Rank & Folder toolbar, or choose RankFolder → Settings."),
+                ("Open Appearance", "Click the Settings button in the Rank & Folder toolbar, or choose Rank & Folder → Settings."),
                 ("Choose a text size", "Larger is the starting size. Choose Standard or Largest for the most comfortable reading size."),
                 ("Choose a theme", "System follows your Mac automatically. Light and Dark keep Rank & Folder in the appearance you choose without changing Finder."),
                 ("Choose color vision support", "Choose Standard colors, Red-green color vision deficiency, Blue-yellow color vision deficiency, or Complete color vision deficiency.")
@@ -966,7 +994,7 @@ private struct HelpTopicView: View {
             HelpDefinition(title: "Protected folders", example: "macOS may separately ask to allow access to Downloads, Documents, Desktop, a cloud folder, network drive, or removable drive after you add it. Rank & Folder uses that access only for the selected folder’s names and standard metadata. Revoke a folder category in System Settings → Privacy & Security → Files & Folders.", icon: "folder.badge.questionmark")
             HelpDefinition(title: "Accessibility", example: "Needed only to identify the focused Finder folder and operate Finder’s existing view controls. macOS grants this broad permission; Rank & Folder deliberately uses a narrow subset.", icon: "accessibility")
             HelpDefinition(title: "Mac compatibility check", example: "This is Rank & Folder’s own consent, not a System Settings permission. The check happens locally and raw specs are not saved. Turn it off in Models at any time.", icon: "cpu")
-            HelpDefinition(title: "Models", example: "Rank & Folder sends Ollama requests only to its local endpoint. Ollama’s own behavior and model sources apply. RankFolder does not offer a cloud model connection in this preview.", icon: "brain")
+            HelpDefinition(title: "Models", example: "Rank & Folder sends Ollama requests only to its local endpoint. Ollama’s own behavior and model sources apply. Rank & Folder does not offer a cloud model connection in this preview.", icon: "brain")
             HelpDefinition(title: "Local Network", example: "macOS may ask for Local Network access when you choose Ollama. Rank & Folder uses it only to reach Ollama on this Mac. Revoke it under System Settings → Privacy & Security → Local Network.", icon: "network")
 
         case .accessibility:
@@ -992,13 +1020,14 @@ private struct HelpTopicView: View {
             HelpDefinition(title: "What it can change", example: "A saved profile and Finder’s existing view controls. Folder previews are read-only.", icon: "slider.horizontal.3")
             HelpDefinition(title: "What it does not do", example: "No file-content reading, hidden .DS_Store editing, arbitrary command execution, keystroke logging, screen capture, analytics, or telemetry. Existing-Ollama commands are copied only when you choose Copy.", icon: "nosign")
             HelpDefinition(title: "Optional networking", example: "Choosing layouts yourself needs no model connection. While the local-model path is selected, Rank & Folder checks Ollama on this Mac for current runner and model status. Folder summaries are sent only after you ask for a layout. No cloud model connection is available in this preview.", icon: "network")
-            HelpDefinition(title: "Reset Rank & Folder", example: "Open Rank & Folder → Settings → Reset. Review the required reset items, then separately choose whether to remove RankFolder’s Ollama program or its managed models. A final screen lists exactly what will happen. Your files and separate Ollama installations are never changed.", icon: "arrow.counterclockwise")
-            HelpDefinition(title: "License", example: "Rank & Folder uses the PolyForm Noncommercial License 1.0.0. Open About RankFolder for the official terms and the project’s GitHub releases.", icon: "doc.text")
+            HelpDefinition(title: "Reset Rank & Folder", example: "Open Rank & Folder → Settings → Reset. Review the required reset items, then separately choose whether to remove Rank & Folder’s Ollama program or its managed models. A final screen lists exactly what will happen. Your files and separate Ollama installations are never changed.", icon: "arrow.counterclockwise")
+            HelpDefinition(title: "License", example: "Rank & Folder uses the PolyForm Noncommercial License 1.0.0. Open About Rank & Folder for the official terms and the project’s GitHub releases.", icon: "doc.text")
             HelpCallout(icon: "lock.shield", text: "No software can be proven completely safe. Review SECURITY.md and the source before granting broad macOS permissions.")
         }
     }
 }
 
+/// The opening line of a help topic.
 private struct HelpIntro: View {
     let text: String
     init(_ text: String) { self.text = text }
@@ -1007,6 +1036,7 @@ private struct HelpIntro: View {
     }
 }
 
+/// A numbered list of steps inside a help topic.
 private struct HelpSteps: View {
     let steps: [(String, String)]
     var body: some View {
@@ -1028,6 +1058,7 @@ private struct HelpSteps: View {
     }
 }
 
+/// A term inside a help topic, with an example of what it means.
 private struct HelpDefinition: View {
     let title: String
     let example: String
@@ -1047,6 +1078,7 @@ private struct HelpDefinition: View {
     }
 }
 
+/// A single highlighted note inside a help topic.
 private struct HelpCallout: View {
     let icon: String
     let text: String
@@ -1059,6 +1091,7 @@ private struct HelpCallout: View {
     }
 }
 
+/// One keyboard shortcut and the action it performs.
 private struct HelpShortcut: View {
     let keys: String
     let action: String
@@ -1076,6 +1109,8 @@ private struct HelpShortcut: View {
     }
 }
 
+/// The app's menu bar entries, including the replacements for the standard About
+/// and Help items.
 struct RankFolderCommands: Commands {
     @Environment(\.openWindow) private var openWindow
     let onboarding: OnboardingStore
@@ -1102,6 +1137,8 @@ struct RankFolderCommands: Commands {
     }
 }
 
+/// The About window, showing the version, the license, and links to the license
+/// text and the releases page.
 struct RankFolderAboutView: View {
     private let releasesURL = URL(string: "https://github.com/drabhikroy/rank-and-folder/releases")!
     private let licenseURL = URL(string: "https://polyformproject.org/licenses/noncommercial/1.0.0")!

@@ -3,6 +3,8 @@ import Combine
 import FinderSync
 import Foundation
 
+/// What automation is currently doing. Each case carries the sentence shown to
+/// the person, so the status and its wording never drift apart.
 enum AutomationStatus: Equatable {
     case ready
     case applying(String)
@@ -72,7 +74,7 @@ final class AutomationCoordinator: ObservableObject {
 
     var statusMessage: String {
         if status == .ready && !setupComplete {
-            return "RankFolder is ready. Optional Finder automation is off."
+            return "Rank & Folder is ready. Optional Finder automation is off."
         }
         return status.message
     }
