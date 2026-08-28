@@ -2,13 +2,13 @@
 
 # Rank & Folder
 
-Save a different way to group and sort each folder.
-
 [![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial%201.0.0-blue)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-macOS%2014%2B-lightgrey)](#requirements)
 [![Release](https://img.shields.io/github/v/release/drabhikroy/rank-and-folder)](https://github.com/drabhikroy/rank-and-folder/releases)
 
 </div>
+
+Save a different way to group and sort each folder.
 
 <img src="Docs/images/home-dark.png" alt="The Rank & Folder home screen, showing the sidebar of saved folders and cards for organizing a folder and for the optional local model.">
 
