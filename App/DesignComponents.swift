@@ -1,32 +1,102 @@
 import AppKit
 import SwiftUI
 
-/// Rank & Folder uses a deep jade action color with warm coral and plum accents.
-/// The combination gives the app its own identity while semantic words and
-/// symbols continue to carry every important meaning.
+/// The five colors the interface fills and tints with, in one set per color
+/// vision mode.
 ///
-/// Every value here is a fixed color rather than the system accent. The system
-/// accent is chosen in System Settings and can be a light hue such as yellow,
-/// which would drop white label text below the WCAG 2.2 AA contrast ratio
-/// wherever Rank & Folder fills a control with it. Fixed colors keep the contrast
-/// ratios in Docs/Interface-Design.md true on every Mac.
-enum RankFolderPalette {
-    static let action = Color(red: 0.03, green: 0.43, blue: 0.38)
-    static let actionPressed = Color(red: 0.02, green: 0.34, blue: 0.31)
-    static let coral = Color(red: 0.79, green: 0.24, blue: 0.28)
-    static let plum = Color(red: 0.39, green: 0.20, blue: 0.46)
-    static let amber = Color(red: 0.86, green: 0.55, blue: 0.14)
-
-    /// The tint for icons, chips, and selected states. It is the same jade as
-    /// `action`, named separately so call sites read as intent rather than as
-    /// a reference to the primary button color.
-    static let accent = action
-
-    /// The only label color placed on top of a filled `action` or `accent`
-    /// surface. Both jade values are dark enough for white to clear AA.
-    static let onAccent = Color.white
+/// Every value is a fixed color rather than the system accent. The system accent
+/// is chosen in System Settings and can be a light hue such as yellow, which
+/// would drop white label text below the WCAG 2.2 AA contrast ratio wherever
+/// Rank & Folder fills a control with it. Fixed colors keep the contrast ratios
+/// in Docs/Interface-Design.md true on every Mac.
+struct RankFolderPaletteTokens {
+    let action: Color
+    let actionPressed: Color
+    let coral: Color
+    let plum: Color
+    let amber: Color
 }
 
+/// The colors the interface draws with, resolved against the current color
+/// vision mode.
+///
+/// The tokens are computed properties over `colorVisionMode` rather than stored
+/// constants, so a mode change reaches all of the roughly one hundred call sites
+/// without each one having to read the environment. `AppearancePreferences` sets
+/// the mode whenever the stored preference loads or changes, and the window
+/// content is rebuilt on the same change so the new values reach the screen.
+enum RankFolderPalette {
+    private(set) static var colorVisionMode: ColorVisionMode = .standard
+
+    static func use(_ mode: ColorVisionMode) {
+        colorVisionMode = mode
+    }
+
+    static var tokens: RankFolderPaletteTokens { tokens(for: colorVisionMode) }
+
+    static var action: Color { tokens.action }
+    static var actionPressed: Color { tokens.actionPressed }
+    static var coral: Color { tokens.coral }
+    static var plum: Color { tokens.plum }
+    static var amber: Color { tokens.amber }
+
+    /// The tint for icons, chips, and selected states. It is the same color as
+    /// `action`, named separately so call sites read as intent rather than as a
+    /// reference to the primary button color.
+    static var accent: Color { action }
+
+    /// The only label color placed on top of a filled `action`, `coral`, or
+    /// `plum` surface. Every one of those fills, in every mode, is dark enough
+    /// for white to clear the AA body ratio of 4.5 to 1.
+    static let onAccent = Color.white
+
+    /// Standard uses jade, coral, and plum. The red and green pair collapses
+    /// under deuteranopia and protanopia, so the red-green set moves to a blue
+    /// and amber pair and separates its third color by lightness. Blue and
+    /// yellow collapse under tritanopia, so that set moves to a green and
+    /// crimson pair. The complete deficiency set carries no hue at all and
+    /// separates by lightness only, matching the status roles that resolve to
+    /// the primary label color in the same mode.
+    static func tokens(for mode: ColorVisionMode) -> RankFolderPaletteTokens {
+        switch mode {
+        case .standard:
+            RankFolderPaletteTokens(
+                action: Color(red: 0.03, green: 0.43, blue: 0.38),
+                actionPressed: Color(red: 0.02, green: 0.34, blue: 0.31),
+                coral: Color(red: 0.79, green: 0.24, blue: 0.28),
+                plum: Color(red: 0.39, green: 0.20, blue: 0.46),
+                amber: Color(red: 0.60, green: 0.39, blue: 0.02)
+            )
+        case .redGreen:
+            RankFolderPaletteTokens(
+                action: Color(red: 0.09, green: 0.36, blue: 0.68),
+                actionPressed: Color(red: 0.06, green: 0.28, blue: 0.54),
+                coral: Color(red: 0.63, green: 0.42, blue: 0.02),
+                plum: Color(red: 0.10, green: 0.13, blue: 0.31),
+                amber: Color(red: 0.63, green: 0.42, blue: 0.02)
+            )
+        case .blueYellow:
+            RankFolderPaletteTokens(
+                action: Color(red: 0.02, green: 0.42, blue: 0.36),
+                actionPressed: Color(red: 0.01, green: 0.33, blue: 0.28),
+                coral: Color(red: 0.75, green: 0.13, blue: 0.28),
+                plum: Color(red: 0.33, green: 0.10, blue: 0.24),
+                amber: Color(red: 0.42, green: 0.40, blue: 0.10)
+            )
+        case .monochrome:
+            RankFolderPaletteTokens(
+                action: Color(red: 0.15, green: 0.16, blue: 0.17),
+                actionPressed: Color(red: 0.09, green: 0.10, blue: 0.11),
+                coral: Color(red: 0.42, green: 0.43, blue: 0.45),
+                plum: Color(red: 0.28, green: 0.29, blue: 0.31),
+                amber: Color(red: 0.35, green: 0.36, blue: 0.38)
+            )
+        }
+    }
+}
+
+/// The window background. A window background color with two faint washes over
+/// it, so a plain window is not flat without competing with the content.
 struct RankFolderBackdrop: View {
     var body: some View {
         ZStack {
@@ -57,6 +127,7 @@ struct RankFolderBackdrop: View {
     }
 }
 
+/// The rounded panel most content sits in.
 struct SurfaceCard<Content: View>: View {
     @Environment(\.rankFolderPanelSpacing) private var panelSpacing
     private let content: Content
@@ -117,6 +188,8 @@ struct RankFolderPrimaryActionButtonStyle: ButtonStyle {
     }
 }
 
+/// The wide button that starts a local model action, filled with a gradient so
+/// it reads as separate from the primary action.
 struct RankFolderModelActionButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
 
@@ -137,7 +210,8 @@ struct RankFolderModelActionButtonStyle: ButtonStyle {
             )
             .overlay {
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(Color.white.opacity(0.16), lineWidth: 1)
+                    .stroke(Color.white.opacity(0.22), lineWidth: 1)
+                    .blendMode(.overlay)
             }
             .shadow(
                 color: RankFolderPalette.plum.opacity(configuration.isPressed ? 0.08 : 0.24),
@@ -149,6 +223,7 @@ struct RankFolderModelActionButtonStyle: ButtonStyle {
     }
 }
 
+/// A secondary action, outlined rather than filled.
 struct RankFolderSecondaryActionButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
 
@@ -167,6 +242,8 @@ struct RankFolderSecondaryActionButtonStyle: ButtonStyle {
     }
 }
 
+/// The numbered list of setup steps for optional Finder automation, showing
+/// which are done and what each remaining one needs.
 struct SetupChecklist: View {
     @ObservedObject var automation: AutomationCoordinator
     let showFolderStep: Bool
@@ -266,6 +343,9 @@ struct SetupChecklist: View {
     }
 }
 
+/// Shown when macOS has already approved a different copy of the app for
+/// Accessibility. It explains why the approval does not carry over and what to
+/// remove.
 private struct AccessibilityRecoveryView: View {
     @Environment(\.rankFolderColorVisionMode) private var colorVisionMode
     @ObservedObject var automation: AutomationCoordinator
@@ -311,12 +391,13 @@ private struct AccessibilityRecoveryView: View {
 
     private var recoveryInstructions: String {
         if automation.isRunningFromApplications {
-            return "If Accessibility already shows Rank & Folder as On, macOS approved another copy or an earlier build. Remove that RankFolder row, click +, choose the copy below, and turn it on. This screen will recognize it automatically."
+            return "If Accessibility already shows Rank & Folder as On, macOS approved another copy or an earlier build. Remove that Rank & Folder row, click +, choose the copy below, and turn it on. This screen will recognize it automatically."
         }
         return "Accessibility approval follows a specific app copy. Move Rank & Folder to Applications, quit this copy, reopen the one in Applications, and approve it there."
     }
 }
 
+/// One step of the setup list, marked complete, pending, or optional.
 private struct SetupRow: View {
     @Environment(\.rankFolderColorVisionMode) private var colorVisionMode
     let number: Int
@@ -371,6 +452,8 @@ private struct SetupRow: View {
     }
 }
 
+/// Reports what automation is currently doing, or what went wrong, in the color
+/// and words of the matching status role.
 struct AutomationStatusBanner: View {
     @Environment(\.rankFolderColorVisionMode) private var colorVisionMode
     let status: AutomationStatus

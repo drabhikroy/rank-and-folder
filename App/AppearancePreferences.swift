@@ -2,6 +2,7 @@ import AppKit
 import Combine
 import SwiftUI
 
+/// Whether the app follows the Mac's appearance or is held to light or dark.
 enum AppAppearanceMode: String, CaseIterable, Identifiable {
     case system
     case light
@@ -42,6 +43,8 @@ enum AppAppearanceMode: String, CaseIterable, Identifiable {
     }
 }
 
+/// What a status color is saying, rather than which color it is. The color for
+/// each role is decided by the current color vision mode.
 enum StatusColorRole {
     case information
     case success
@@ -49,6 +52,7 @@ enum StatusColorRole {
     case danger
 }
 
+/// The text size the app draws at. Larger is the starting value.
 enum AppTextSize: String, CaseIterable, Identifiable {
     case standard
     case larger
@@ -73,14 +77,18 @@ enum AppTextSize: String, CaseIterable, Identifiable {
     }
 }
 
+/// Carries the chosen text size down the view tree as a multiplier.
 private struct RankFolderTextScaleKey: EnvironmentKey {
     static let defaultValue: CGFloat = 1
 }
 
+/// Carries a padding multiplier down the view tree so panels can be tightened in
+/// one place.
 private struct RankFolderPanelSpacingKey: EnvironmentKey {
     static let defaultValue: CGFloat = 1
 }
 
+/// Makes the text scale and the panel spacing readable from any view.
 extension EnvironmentValues {
     var rankFolderTextScale: CGFloat {
         get { self[RankFolderTextScaleKey.self] }
@@ -93,6 +101,8 @@ extension EnvironmentValues {
     }
 }
 
+/// The named text sizes the app draws with, each with a fixed point size that
+/// the chosen text size then scales.
 enum RankFolderFontRole {
     case caption2, caption, callout, body, headline, title3, title2, title, largeTitle
 
@@ -111,6 +121,7 @@ enum RankFolderFontRole {
     }
 }
 
+/// Applies a font role at the current text scale.
 private struct RankFolderFontModifier: ViewModifier {
     @Environment(\.rankFolderTextScale) private var scale
     let role: RankFolderFontRole
@@ -122,6 +133,7 @@ private struct RankFolderFontModifier: ViewModifier {
     }
 }
 
+/// Applies one of the named font roles at the current text scale.
 extension View {
     func rankFolderFont(
         _ role: RankFolderFontRole,
@@ -132,6 +144,9 @@ extension View {
     }
 }
 
+/// The color vision mode the whole interface renders in. It decides both the
+/// status colors and the fills, so choosing one repaints the app rather than
+/// only its status indicators.
 enum ColorVisionMode: String, CaseIterable, Identifiable {
     case standard
     case redGreen
@@ -162,35 +177,55 @@ enum ColorVisionMode: String, CaseIterable, Identifiable {
         }
     }
 
+    /// Status colors come from the same set the rest of the interface fills
+    /// with, so a status color and a filled button never disagree about what a
+    /// mode looks like.
+    ///
+    /// Each set was checked two ways. Every color clears 4.5 to 1 against a
+    /// white background, and every pair was run through a dichromacy simulation
+    /// for the deficiency the set is meant for. The red-green set separates on
+    /// every pair. Under tritanopia, warning and danger both fall in the warm
+    /// range and separate by lightness rather than by hue, which is why every
+    /// place that shows a status also shows a symbol and a word. The complete
+    /// deficiency set carries no hue at all and leaves the whole job to those.
     func color(for role: StatusColorRole) -> Color {
         switch (self, role) {
-        case (.standard, .information): RankFolderPalette.accent
-        case (.standard, .success): .green
-        case (.standard, .warning): .orange
-        case (.standard, .danger): .red
+        case (.standard, .information): Color(red: 0.03, green: 0.43, blue: 0.38)
+        case (.standard, .success): Color(red: 0.10, green: 0.45, blue: 0.16)
+        case (.standard, .warning): Color(red: 0.60, green: 0.39, blue: 0.02)
+        case (.standard, .danger): Color(red: 0.79, green: 0.24, blue: 0.28)
 
-        case (.redGreen, .information): .cyan
-        case (.redGreen, .success): .blue
-        case (.redGreen, .warning): .orange
-        case (.redGreen, .danger): .purple
+        case (.redGreen, .information): Color(red: 0.09, green: 0.36, blue: 0.68)
+        case (.redGreen, .success): Color(red: 0.10, green: 0.13, blue: 0.31)
+        case (.redGreen, .warning): Color(red: 0.63, green: 0.42, blue: 0.02)
+        case (.redGreen, .danger): Color(red: 0.42, green: 0.15, blue: 0.04)
 
-        case (.blueYellow, .information): .purple
-        case (.blueYellow, .success): .green
-        case (.blueYellow, .warning): .pink
-        case (.blueYellow, .danger): .red
+        case (.blueYellow, .information): Color(red: 0.33, green: 0.10, blue: 0.24)
+        case (.blueYellow, .success): Color(red: 0.02, green: 0.42, blue: 0.36)
+        case (.blueYellow, .warning): Color(red: 0.45, green: 0.30, blue: 0.00)
+        case (.blueYellow, .danger): Color(red: 0.75, green: 0.13, blue: 0.28)
 
-        case (.monochrome, .information): .primary
-        case (.monochrome, .success): .primary
-        case (.monochrome, .warning): .primary
-        case (.monochrome, .danger): .primary
+        case (.monochrome, _): Color.primary
         }
+    }
+
+    /// The label color for text or a symbol placed on top of a solid status
+    /// fill. The hued sets are all dark enough for white. The complete
+    /// deficiency set fills with the primary label color, which is dark in light
+    /// appearance and light in dark appearance, so a fixed white label would
+    /// disappear against it in dark appearance. The text background color is the
+    /// inverse of the primary label color in both appearances.
+    var labelOnStatusFill: Color {
+        self == .monochrome ? Color(nsColor: .textBackgroundColor) : .white
     }
 }
 
+/// Carries the chosen color vision mode down the view tree.
 private struct ColorVisionModeEnvironmentKey: EnvironmentKey {
     static let defaultValue = ColorVisionMode.standard
 }
 
+/// Makes the color vision mode readable from any view.
 extension EnvironmentValues {
     var rankFolderColorVisionMode: ColorVisionMode {
         get { self[ColorVisionModeEnvironmentKey.self] }
@@ -199,6 +234,8 @@ extension EnvironmentValues {
 }
 
 @MainActor
+/// The three appearance choices and their storage. Each choice writes itself
+/// back to user defaults as it changes, so nothing has to be saved explicitly.
 final class AppearancePreferences: ObservableObject {
     private enum Key {
         static let appearance = "appearance.mode"
@@ -215,7 +252,10 @@ final class AppearancePreferences: ObservableObject {
     }
 
     @Published var colorVisionMode: ColorVisionMode {
-        didSet { defaults.set(colorVisionMode.rawValue, forKey: Key.colorVision) }
+        didSet {
+            defaults.set(colorVisionMode.rawValue, forKey: Key.colorVision)
+            RankFolderPalette.use(colorVisionMode)
+        }
     }
 
     @Published var textSize: AppTextSize {
@@ -236,6 +276,7 @@ final class AppearancePreferences: ObservableObject {
             rawValue: defaults.string(forKey: Key.textSize) ?? ""
         ) ?? .larger
         defaults.removeObject(forKey: Key.legacyPanelSpacing)
+        RankFolderPalette.use(colorVisionMode)
         applyAppearanceToEveryWindow()
     }
 
@@ -264,6 +305,8 @@ final class AppearancePreferences: ObservableObject {
     }
 }
 
+/// The Appearance tab of Settings, holding the appearance, text size, and color
+/// vision choices with a live preview of the colors each mode produces.
 struct AppearanceSettingsView: View {
     @ObservedObject var preferences: AppearancePreferences
 
@@ -347,6 +390,7 @@ struct AppearanceSettingsView: View {
     }
 }
 
+/// The Settings window and its tabs.
 struct RankFolderSettingsView: View {
     @ObservedObject var appearance: AppearancePreferences
     @ObservedObject var onboarding: OnboardingStore
@@ -371,6 +415,8 @@ struct RankFolderSettingsView: View {
     }
 }
 
+/// The Reset tab of Settings, which only opens the separate review window rather
+/// than resetting anything itself.
 private struct GeneralSettingsView: View {
     @Environment(\.openWindow) private var openWindow
     @ObservedObject var appearance: AppearancePreferences
@@ -414,6 +460,8 @@ private struct GeneralSettingsView: View {
     }
 }
 
+/// The reset review window. It gathers the choices first and then shows exactly
+/// what will happen before anything is removed.
 struct ResetAppDataView: View {
     private enum Stage { case choices, review }
 
@@ -611,6 +659,7 @@ struct ResetAppDataView: View {
     }
 }
 
+/// One optional item the person can include in a reset.
 private struct ResetChoiceToggle: View {
     @Binding var isOn: Bool
     let icon: String
@@ -634,6 +683,8 @@ private struct ResetChoiceToggle: View {
     }
 }
 
+/// One line of the final reset summary, listing something that will or will not
+/// change.
 private struct ResetReviewRow: View {
     let icon: String
     let title: String
@@ -654,17 +705,37 @@ private struct ResetReviewRow: View {
     }
 }
 
+/// Shows what the selected color vision mode looks like, so the choice can be
+/// read from the colors themselves rather than only from its name.
 private struct StatusPalettePreview: View {
     let mode: ColorVisionMode
 
     var body: some View {
-        HStack(spacing: 10) {
-            status("Ready", image: "checkmark.circle.fill", role: .success)
-            status("Needs attention", image: "exclamationmark.triangle.fill", role: .warning)
-            status("Error", image: "xmark.circle.fill", role: .danger)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                status("Ready", image: "checkmark.circle.fill", role: .success)
+                status("Needs attention", image: "exclamationmark.triangle.fill", role: .warning)
+                status("Error", image: "xmark.circle.fill", role: .danger)
+            }
+            HStack(spacing: 10) {
+                fill("Buttons", color: RankFolderPalette.tokens(for: mode).action)
+                fill("Model", color: RankFolderPalette.tokens(for: mode).plum)
+                fill("Highlights", color: RankFolderPalette.tokens(for: mode).coral)
+            }
         }
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("Status color preview")
+        .accessibilityLabel("Color preview for the selected mode")
+    }
+
+    /// Shows a filled sample rather than a tinted one, because the fills are
+    /// what a person sees most and are where a label has to stay readable.
+    private func fill(_ title: String, color: Color) -> some View {
+        Text(title)
+            .rankFolderFont(.caption, weight: .semibold)
+            .foregroundStyle(mode.labelOnStatusFill)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .background(color, in: Capsule())
     }
 
     private func status(_ title: String, image: String, role: StatusColorRole) -> some View {

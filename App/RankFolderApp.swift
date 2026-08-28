@@ -2,6 +2,8 @@ import AppKit
 import SwiftUI
 
 @main
+/// The application and its windows. Each window applies the same presentation so
+/// appearance, text size, and color vision choices reach all of them.
 struct RankFolderApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var appearance = AppearancePreferences()
@@ -122,6 +124,7 @@ struct RankFolderApp: App {
     }
 }
 
+/// Applies the three appearance choices to a window's content.
 private struct RankFolderPresentationModifier: ViewModifier {
     @ObservedObject var appearance: AppearancePreferences
 
@@ -132,9 +135,19 @@ private struct RankFolderPresentationModifier: ViewModifier {
             .environment(\.rankFolderPanelSpacing, 1)
             .tint(RankFolderPalette.action)
             .textSelection(.enabled)
+            // Most call sites read the palette as a type property rather than
+            // from the environment, so changing the environment value alone
+            // leaves them holding the colors of the previous mode. Tying the
+            // window content to the mode rebuilds it, which is what makes a new
+            // choice visible everywhere at once. The rebuild resets view state
+            // such as the selected sidebar row, which is acceptable for a choice
+            // made once in Settings.
+            .id(appearance.colorVisionMode)
     }
 }
 
+/// Sets the parts of window behavior SwiftUI does not expose, such as the
+/// minimum content size and whether the zoom button works.
 private struct RankFolderWindowConfiguration: NSViewRepresentable {
     let minSize: NSSize
 
@@ -160,6 +173,7 @@ private struct RankFolderWindowConfiguration: NSViewRepresentable {
     }
 }
 
+/// Shorthands for the two modifiers every window applies.
 private extension View {
     func rankFolderPresentation(_ appearance: AppearancePreferences) -> some View {
         modifier(RankFolderPresentationModifier(appearance: appearance))
@@ -170,6 +184,7 @@ private extension View {
     }
 }
 
+/// The full preview window, which shows a placeholder until a folder is chosen.
 private struct OrganizedViewWindow: View {
     @ObservedObject private var presentation = SecondaryWindowStore.shared
 
@@ -188,6 +203,8 @@ private struct OrganizedViewWindow: View {
     }
 }
 
+/// The local model window, which shows a placeholder until a saved folder is
+/// chosen.
 private struct ModelLayoutWindow: View {
     @ObservedObject private var presentation = SecondaryWindowStore.shared
     @ObservedObject var store: ProfileStore
@@ -208,6 +225,7 @@ private struct ModelLayoutWindow: View {
     }
 }
 
+/// What a secondary window shows before it has anything to show.
 private struct UtilityWindowPlaceholder: View {
     let icon: String
     let title: String
@@ -231,6 +249,8 @@ private struct UtilityWindowPlaceholder: View {
     }
 }
 
+/// The menu bar extra, reporting automation status and offering the actions that
+/// do not need the main window.
 private struct RankFolderMenu: View {
     @Environment(\.openWindow) private var openWindow
     @Environment(\.rankFolderColorVisionMode) private var colorVisionMode

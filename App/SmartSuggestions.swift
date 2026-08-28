@@ -5,6 +5,9 @@ import UniformTypeIdentifiers
 
 // MARK: - Privacy-preserving folder summary
 
+/// A count summary of one folder. This is the only thing a model is ever shown.
+/// It carries how many items there are and how they fall into categories, never
+/// a file name and never any file content.
 struct FolderSnapshot: Sendable {
     let itemCount: Int
     let folderCount: Int
@@ -56,6 +59,8 @@ struct FolderSnapshot: Sendable {
     }
 }
 
+/// Builds the count summary, after confirming the saved folder is still the one
+/// that was verified.
 enum FolderSnapshotBuilder {
     static func build(profile: RankFolderProfile) throws -> FolderSnapshot {
         guard profile.canSafelyReadFolderMetadata else {
@@ -146,6 +151,8 @@ enum FolderSnapshotBuilder {
 
 // MARK: - Suggestions and validation
 
+/// One layout a model proposed, together with its stated reasoning and which
+/// model produced it. Nothing here is applied until the person accepts it.
 struct LayoutSuggestion: Sendable {
     let recipe: OrganizationRecipe
     let rationale: String
@@ -154,6 +161,8 @@ struct LayoutSuggestion: Sendable {
     let folderDisclosure: String
 }
 
+/// Renders a recipe as the short sentence used when describing the current
+/// layout to a model.
 private extension OrganizationRecipe {
     var promptDescription: String {
         let sectionText = sections.isEmpty
@@ -169,6 +178,8 @@ private extension OrganizationRecipe {
     }
 }
 
+/// Renders one level for a prompt, and gives it a signature used to tell two
+/// suggestions apart.
 private extension OrganizationLevel {
     var choiceSignature: String {
         "\(criterion.rawValue):\(direction?.rawValue ?? "finderDefault")"
@@ -181,14 +192,17 @@ private extension OrganizationLevel {
 
 // MARK: - Ollama's loopback-only connector
 
+/// The one field read from a generate reply.
 private struct OllamaGenerateResponse: Decodable {
     let response: String
 }
 
+/// The one field read from a version reply, used to confirm a service answered.
 private struct OllamaVersionResponse: Decodable {
     let version: String
 }
 
+/// The installed model list, used to say which models are already downloaded.
 private struct OllamaTagsResponse: Decodable {
     struct Model: Decodable {
         let name: String
@@ -199,6 +213,9 @@ private struct OllamaTagsResponse: Decodable {
 
 private typealias OllamaRunningModelsResponse = OllamaTagsResponse
 
+/// Refuses any redirect. The client is fixed to the loopback address, and a
+/// redirect is the one way a reply could otherwise move the connection off this
+/// Mac, so redirects are rejected rather than followed.
 private final class LoopbackOnlySessionDelegate: NSObject, URLSessionTaskDelegate,
     @unchecked Sendable {
     func urlSession(
@@ -213,6 +230,9 @@ private final class LoopbackOnlySessionDelegate: NSObject, URLSessionTaskDelegat
     }
 }
 
+/// The connection to a local Ollama service. Every request goes to the loopback
+/// address, caches and cookies are disabled, and a redirect away from that
+/// address is refused rather than followed.
 enum OllamaClient {
     private static let baseURL = URL(string: "http://127.0.0.1:11434/api/")!
     private static let session: URLSession = {
@@ -439,6 +459,9 @@ enum OllamaClient {
 // MARK: - Suggestion sheet
 
 @MainActor
+/// Runs one suggestion request and holds its result. Every reply is checked
+/// against the fixed list of criteria before it can become a layout, and a reply
+/// that fails is retried rather than shown.
 final class SmartSuggestionViewModel: ObservableObject {
     enum State {
         case idle
@@ -548,6 +571,8 @@ final class SmartSuggestionViewModel: ObservableObject {
     }
 }
 
+/// The window that asks a local model for a layout and shows the result for
+/// review. Nothing is saved until the person accepts it.
 struct SmartSuggestionView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dismissWindow) private var dismissWindow
@@ -883,11 +908,14 @@ struct SmartSuggestionView: View {
     }
 }
 
+/// Whether the result is being read as a list of rules or as a preview of the
+/// folder under those rules.
 private enum SuggestionResultStage {
     case review
     case preview
 }
 
+/// The selectable chip for one earlier suggestion in this session.
 private struct SuggestionHistoryButtonStyle: ButtonStyle {
     let selected: Bool
 
@@ -911,6 +939,7 @@ private struct SuggestionHistoryButtonStyle: ButtonStyle {
     }
 }
 
+/// A numbered heading for one step of the suggestion flow.
 private struct SuggestionStepLabel: View {
     let number: Int
     let title: String
@@ -932,6 +961,8 @@ private struct SuggestionStepLabel: View {
     }
 }
 
+/// Lists a suggested recipe as plain sentences, so the rules can be read before
+/// the folder preview is opened.
 private struct SuggestionRecipePreview: View {
     let recipe: OrganizationRecipe
 
@@ -1038,6 +1069,8 @@ private struct FlowLayout: Layout {
 
 // MARK: - Model Center and Mac compatibility
 
+/// What this Mac can run, read only after the person agrees. Used to say which
+/// downloadable models would fit.
 struct DeviceCapabilitySnapshot {
     let chip: String
     let memoryGB: Int
@@ -1045,6 +1078,7 @@ struct DeviceCapabilitySnapshot {
     let freeStorageGB: Int?
 }
 
+/// Reads the chip, memory, system version, and free storage figures.
 enum DeviceCapabilityService {
     static func current() -> DeviceCapabilitySnapshot {
         #if arch(arm64)
@@ -1068,6 +1102,8 @@ enum DeviceCapabilityService {
     }
 }
 
+/// One model the app knows how to offer, with what it needs and what it is good
+/// at.
 struct LocalModelDescriptor: Identifiable {
     static let defaultModelID = ModelRecommendationPolicy.startingModelID
 
@@ -1244,6 +1280,8 @@ struct LocalModelDescriptor: Identifiable {
 }
 
 @MainActor
+/// Tracks whether a local Ollama service is reachable, which models are
+/// installed, and which one is selected.
 final class ModelCenterViewModel: ObservableObject {
     enum OllamaState: Equatable {
         case checking
@@ -1470,6 +1508,8 @@ final class ModelCenterViewModel: ObservableObject {
 }
 
 @MainActor
+/// Collects what a download would fetch so the person can review it before
+/// anything is downloaded.
 final class LocalDownloadReviewStore: ObservableObject {
     enum Item {
         case ollama
@@ -1481,6 +1521,8 @@ final class LocalDownloadReviewStore: ObservableObject {
     private init() {}
 }
 
+/// The window that lists exactly what will be downloaded, where it will be put,
+/// and how large it is, before a download starts.
 struct LocalDownloadReviewView: View {
     @Environment(\.dismissWindow) private var dismissWindow
     @ObservedObject private var review = LocalDownloadReviewStore.shared
@@ -1592,6 +1634,7 @@ struct LocalDownloadReviewView: View {
     }
 }
 
+/// One group of the download review list.
 private struct DownloadReviewSection: View {
     let title: String
     let icon: String
@@ -1617,6 +1660,8 @@ private struct DownloadReviewSection: View {
     }
 }
 
+/// The window for choosing whether a local model is used, installing or
+/// connecting Ollama, and picking which model to run.
 struct ModelCenterView: View {
     @Environment(\.rankFolderPanelSpacing) private var panelSpacing
     @Environment(\.openWindow) private var openWindow
@@ -2001,7 +2046,7 @@ struct ModelCenterView: View {
                     }
                 }
             } else {
-                Text("Use these commands only if you want Ollama managed outside Rank & Folder. RankFolder copies commands but never runs them for you.")
+                Text("Use these commands only if you want Ollama managed outside Rank & Folder. Rank & Folder copies commands but never runs them for you.")
                     .rankFolderFont(.body)
                     .foregroundStyle(.secondary)
 
@@ -2373,6 +2418,8 @@ struct ModelCenterView: View {
 
 }
 
+/// A side-by-side comparison of the offered models against what this Mac can
+/// run.
 struct ModelComparisonView: View {
     @ObservedObject var onboarding: OnboardingStore
     @ObservedObject private var model = ModelCenterViewModel.shared
@@ -2635,6 +2682,7 @@ struct ModelComparisonView: View {
     }
 }
 
+/// The symbol, title, and explanatory line at the top of a model setup card.
 private struct ModelCardHeading: View {
     let icon: String
     let title: String
@@ -2659,6 +2707,8 @@ private struct ModelCardHeading: View {
     }
 }
 
+/// One numbered terminal instruction with a command the person can copy. The app
+/// copies commands and never runs them.
 private struct TerminalInstructionRow: View {
     let number: Int
     let title: String
@@ -2694,6 +2744,8 @@ private struct TerminalInstructionRow: View {
     }
 }
 
+/// One of the two answers to where Ollama should live, either inside the app's
+/// own support folder or in a separate installation.
 private struct OllamaLocationChoice: View {
     let title: String
     let detail: String
@@ -2740,6 +2792,7 @@ private struct OllamaLocationChoice: View {
     }
 }
 
+/// A numbered step in model setup, filled when the step is done.
 private struct ModelStepHeader: View {
     @Environment(\.rankFolderColorVisionMode) private var colorVisionMode
     let number: Int
@@ -2780,7 +2833,7 @@ private struct ModelStepHeader: View {
                         .rankFolderFont(.headline, weight: .bold)
                 }
             }
-            .foregroundStyle(Color.white)
+            .foregroundStyle(colorVisionMode.labelOnStatusFill)
             .frame(width: 36, height: 36)
             .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
@@ -2792,6 +2845,7 @@ private struct ModelStepHeader: View {
 }
 
 
+/// One small labelled figure, such as memory or download size.
 private struct SpecBadge: View {
     let title: String
     let value: String
@@ -2808,6 +2862,8 @@ private struct SpecBadge: View {
     }
 }
 
+/// One model in the list, showing what it needs, whether it fits this Mac, and
+/// whether it is already downloaded.
 private struct ModelCatalogRow: View {
     @Environment(\.rankFolderColorVisionMode) private var colorVisionMode
     let descriptor: LocalModelDescriptor
