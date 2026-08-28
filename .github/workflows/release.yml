@@ -16,8 +16,19 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # The app uses macOS 26 toolbar API. An #available check gates it at run
+      # time, but the symbols still have to exist in the SDK to compile at all,
+      # so the newest Xcode on the runner is the one to build with. Picking the
+      # newest rather than naming a version keeps this working as the runner
+      # image moves on.
       - name: Select Xcode
-        run: sudo xcode-select -switch /Applications/Xcode_16.app
+        run: |
+          set -euo pipefail
+          ls -d /Applications/Xcode*.app
+          newest=$(ls -d /Applications/Xcode*.app | sort -V | tail -1)
+          sudo xcode-select -switch "$newest"
+          xcodebuild -version
+          xcodebuild -showsdks | grep macosx
 
       - name: Install librsvg for the icon
         run: brew install librsvg
