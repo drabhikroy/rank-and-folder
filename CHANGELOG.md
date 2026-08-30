@@ -3,7 +3,7 @@
 Notable changes to Rank & Folder. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Dates are ISO 8601.
 
-## [1.0.4] - 2026-08-30
+## [1.0.3] - 2026-08-30
 
 ### Security
 
