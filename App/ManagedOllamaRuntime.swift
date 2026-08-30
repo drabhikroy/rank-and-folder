@@ -150,11 +150,24 @@ final class ManagedOllamaRuntime: ObservableObject {
         child.currentDirectoryURL = executable.deletingLastPathComponent()
         child.standardOutput = FileHandle.nullDevice
         child.standardError = FileHandle.nullDevice
-        var environment = ProcessInfo.processInfo.environment
-        environment["OLLAMA_HOST"] = "127.0.0.1:11434"
-        environment["OLLAMA_MODELS"] = ManagedRuntimeInstaller.modelsDirectory.path
-        environment["OLLAMA_NO_CLOUD"] = "1"
-        environment["OLLAMA_KEEP_ALIVE"] = "0"
+        // The child is given a fixed environment rather than a copy of Rank &
+        // Folder's own. Ollama reads more than a dozen OLLAMA_ variables, so an
+        // inherited environment could move the model directory, widen the
+        // origins the local server accepts, or change how it binds, none of
+        // which the person chose here. Only the variables below are passed,
+        // and nothing else in the launching environment reaches the child.
+        var environment: [String: String] = [
+            "PATH": "/usr/bin:/bin:/usr/sbin:/sbin",
+            "HOME": FileManager.default.homeDirectoryForCurrentUser.path,
+            "OLLAMA_HOST": "127.0.0.1:11434",
+            "OLLAMA_ORIGINS": "http://127.0.0.1:11434",
+            "OLLAMA_MODELS": ManagedRuntimeInstaller.modelsDirectory.path,
+            "OLLAMA_NO_CLOUD": "1",
+            "OLLAMA_KEEP_ALIVE": "0"
+        ]
+        if let temporaryDirectory = ProcessInfo.processInfo.environment["TMPDIR"] {
+            environment["TMPDIR"] = temporaryDirectory
+        }
         child.environment = environment
         try child.run()
         process = child
@@ -186,6 +199,7 @@ enum ManagedRuntimeError: LocalizedError {
     case unsafeArchive
     case executableMissing
     case signatureInvalid
+    case identityChanged
     case notInstalled
     case startFailed
     case startTimedOut
@@ -204,6 +218,8 @@ enum ManagedRuntimeError: LocalizedError {
             "The archive was verified, but the Ollama program could not be found inside it."
         case .signatureInvalid:
             "macOS could not verify the downloaded Ollama program, so Rank & Folder did not run it."
+        case .identityChanged:
+            "The Ollama program in Rank & Folder's support folder is no longer the one that was installed, so it was not run. Remove the managed runtime in Models and install it again."
         case .notInstalled:
             "The Rank & Folder-managed Ollama runtime is not installed."
         case .startFailed:
@@ -218,12 +234,10 @@ enum ManagedRuntimeError: LocalizedError {
 /// assets, so a redirect cannot move the download to an arbitrary server.
 private final class RuntimeDownloadDelegate: NSObject, URLSessionTaskDelegate,
     @unchecked Sendable {
-    private let permittedHosts: Set<String> = [
-        "github.com",
-        "objects.githubusercontent.com",
-        "release-assets.githubusercontent.com",
-        "github-releases.githubusercontent.com"
-    ]
+    // One list, shared with the final-response check in the installer. Two
+    // copies of a host allowlist can drift apart, and the copy that is missed
+    // is the one that decides where a download may come from.
+    private let permittedHosts = ManagedRuntimeInstaller.permittedDownloadHosts
 
     func urlSession(
         _ session: URLSession,
@@ -259,6 +273,20 @@ enum ManagedRuntimeInstaller {
         string: "https://github.com/ollama/ollama/releases/download/v0.32.15/ollama-darwin.tgz"
     )!
     static let approximateDownloadBytes: Int64 = 147_000_000
+
+    /// The only hosts a runtime download may come from, whether as the first
+    /// request, as a redirect target, or as the address that finally answered.
+    static let permittedDownloadHosts: Set<String> = [
+        "github.com",
+        "objects.githubusercontent.com",
+        "release-assets.githubusercontent.com",
+        "github-releases.githubusercontent.com"
+    ]
+
+    /// Where the code directory hash of the installed program is remembered, so
+    /// a later launch can tell that the program on disk is still the one that
+    /// arrived in the checksum verified archive.
+    private static let pinnedIdentityKey = "rankFolderManagedRuntimeCodeIdentity.v1"
 
     static var supportDirectory: URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
@@ -317,7 +345,7 @@ enum ManagedRuntimeInstaller {
               let finalURL = http.url,
               finalURL.scheme == "https",
               let finalHost = finalURL.host?.lowercased(),
-              ["github.com", "objects.githubusercontent.com", "release-assets.githubusercontent.com", "github-releases.githubusercontent.com"].contains(finalHost),
+              permittedDownloadHosts.contains(finalHost),
               downloadedFileLooksPlausible(downloadedURL) else {
             throw ManagedRuntimeError.invalidDownload
         }
@@ -342,17 +370,88 @@ enum ManagedRuntimeInstaller {
         for directory in installationDirectories where FileManager.default.fileExists(atPath: directory.path) {
             let executable = try findExecutable(in: directory)
             try verifySignature(at: executable)
+            try requirePinnedIdentity(of: executable)
             return executable
         }
         throw ManagedRuntimeError.executableMissing
     }
 
+    /// Confirms that the program about to be launched is the same one that was
+    /// installed from the checksum verified archive.
+    ///
+    /// A valid signature alone only proves a program has not changed since it
+    /// was signed, and anything on this Mac that can write to the support
+    /// folder can also sign a replacement. Recording the code directory hash at
+    /// install time and requiring it again here is what ties every later launch
+    /// back to the archive whose checksum was checked.
+    ///
+    /// A runtime installed before this check existed has nothing recorded. Its
+    /// current hash is adopted rather than refused, because refusing would
+    /// discard a working install and force a fresh download. Removing and
+    /// reinstalling the runtime from the Models window records a hash that is
+    /// tied to the verified archive.
+    private static func requirePinnedIdentity(of executable: URL) throws {
+        let identity = try codeDirectoryIdentity(at: executable)
+        let defaults = UserDefaults.standard
+        guard let recorded = defaults.string(forKey: pinnedIdentityKey) else {
+            defaults.set(identity, forKey: pinnedIdentityKey)
+            return
+        }
+        guard recorded == identity else {
+            throw ManagedRuntimeError.identityChanged
+        }
+    }
+
+    private static func recordPinnedIdentity(of executable: URL) throws {
+        let identity = try codeDirectoryIdentity(at: executable)
+        UserDefaults.standard.set(identity, forKey: pinnedIdentityKey)
+    }
+
+    private static func forgetPinnedIdentity() {
+        UserDefaults.standard.removeObject(forKey: pinnedIdentityKey)
+    }
+
+    /// The code directory hash macOS records for a signed program, paired with
+    /// the release it was recorded for so that a pinned hash from one version
+    /// can never satisfy another.
+    private static func codeDirectoryIdentity(at executable: URL) throws -> String {
+        // codesign writes its description to standard error, so both streams
+        // are captured here.
+        let description: String
+        do {
+            description = try runTool(
+                "/usr/bin/codesign",
+                arguments: ["--display", "--verbose=2", executable.path],
+                captureOutput: true,
+                captureStandardError: true
+            )
+        } catch {
+            // A program codesign cannot describe is one Rank & Folder cannot
+            // recognize later, which is a signature problem rather than an
+            // archive problem.
+            throw ManagedRuntimeError.signatureInvalid
+        }
+        guard let line = description
+            .split(separator: "\n")
+            .first(where: { $0.hasPrefix("CDHash=") }) else {
+            throw ManagedRuntimeError.signatureInvalid
+        }
+        let hash = line.dropFirst("CDHash=".count).lowercased()
+        guard hash.count >= 40, hash.allSatisfy(\.isHexDigit) else {
+            throw ManagedRuntimeError.signatureInvalid
+        }
+        return "\(releaseVersion):\(hash)"
+    }
+
     private static func findExecutable(in directory: URL) throws -> URL {
         let manager = FileManager.default
+        // Hidden entries are enumerated too. The symbolic link check below is a
+        // safety check, and an entry that escapes the install directory is no
+        // less dangerous for having a name that begins with a period.
         guard let enumerator = manager.enumerator(
             at: directory,
             includingPropertiesForKeys: [.isRegularFileKey, .isSymbolicLinkKey, .fileSizeKey],
-            options: [.skipsHiddenFiles]
+            options: []
         ) else { throw ManagedRuntimeError.executableMissing }
 
         let root = directory.standardizedFileURL.path + "/"
@@ -386,6 +485,10 @@ enum ManagedRuntimeInstaller {
             for directory in installationDirectories where manager.fileExists(atPath: directory.path) {
                 try manager.removeItem(at: directory)
             }
+            // The recorded identity describes a program that no longer exists.
+            // Leaving it behind would make the next install look like a
+            // mismatch instead of a fresh, verified one.
+            forgetPinnedIdentity()
         }
         if removeModels, manager.fileExists(atPath: modelsDirectory.path) {
             try manager.removeItem(at: modelsDirectory)
@@ -447,7 +550,7 @@ enum ManagedRuntimeInstaller {
         if let enumerator = manager.enumerator(
             at: staging,
             includingPropertiesForKeys: [.isSymbolicLinkKey],
-            options: [.skipsHiddenFiles]
+            options: []
         ) {
             var count = 0
             for case let url as URL in enumerator {
@@ -470,8 +573,13 @@ enum ManagedRuntimeInstaller {
         try manager.setAttributes([.posixPermissions: 0o755], ofItemAtPath: executable.path)
         do {
             try verifySignature(at: executable)
+            // This is the one moment the program is known to have come from the
+            // archive whose checksum was just checked, so it is the only moment
+            // its identity may be recorded.
+            try recordPinnedIdentity(of: executable)
         } catch {
             try? manager.removeItem(at: installationDirectory)
+            forgetPinnedIdentity()
             throw ManagedRuntimeError.signatureInvalid
         }
         if manager.fileExists(atPath: compatibleInstallationDirectory.path) {
@@ -482,10 +590,11 @@ enum ManagedRuntimeInstaller {
     /// Checks that the executable still carries a valid signature. This proves
     /// the binary has not been modified since it was signed. It does not prove
     /// who signed it, so a replacement that someone re-signed locally would
-    /// also pass. The pinned archive checksum is what establishes publisher
-    /// identity at install time. Setting `signatureRequirement` to a verified
-    /// Developer ID requirement string would extend that guarantee to every
-    /// later launch.
+    /// also pass this check on its own. `requirePinnedIdentity(of:)` is what
+    /// rejects such a replacement, by requiring the code directory hash
+    /// recorded at install time. Adding a verified Developer ID requirement
+    /// string here would additionally name the publisher, which pinning cannot
+    /// do for a runtime adopted from an older install.
     private static func verifySignature(at executable: URL) throws {
         do {
             _ = try runTool(
@@ -504,19 +613,21 @@ enum ManagedRuntimeInstaller {
     private static func runTool(
         _ executable: String,
         arguments: [String],
-        captureOutput: Bool
+        captureOutput: Bool,
+        captureStandardError: Bool = false
     ) throws -> String {
         let task = Process()
         task.executableURL = URL(fileURLWithPath: executable)
         task.arguments = arguments
         let pipe = Pipe()
         task.standardOutput = captureOutput ? pipe : FileHandle.nullDevice
-        task.standardError = FileHandle.nullDevice
+        task.standardError = captureStandardError ? pipe : FileHandle.nullDevice
         try task.run()
-        let data = captureOutput ? pipe.fileHandleForReading.readDataToEndOfFile() : Data()
+        let capturing = captureOutput || captureStandardError
+        let data = capturing ? pipe.fileHandleForReading.readDataToEndOfFile() : Data()
         task.waitUntilExit()
         guard task.terminationStatus == 0 else { throw ManagedRuntimeError.unsafeArchive }
-        guard captureOutput else { return "" }
+        guard capturing else { return "" }
         guard data.count <= 2_000_000 else { throw ManagedRuntimeError.unsafeArchive }
         return String(decoding: data, as: UTF8.self)
     }

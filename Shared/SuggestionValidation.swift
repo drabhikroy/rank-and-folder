@@ -166,7 +166,7 @@ enum SuggestionRecipeValidator {
     /// Model prose is untrusted display text. This pass removes punctuation
     /// and stock wording that Rank & Folder does not use in its interface.
     static func accessibleRationale(_ text: String, fallback: String) -> String {
-        var result = text
+        var result = displaySafeText(text)
             .replacingOccurrences(of: "\u{2014}", with: ", ")
             .replacingOccurrences(of: "\u{2013}", with: "-")
         let replacements: [(String, String)] = [
@@ -207,6 +207,30 @@ enum SuggestionRecipeValidator {
         let trimmed = result.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !containsDisallowedWriting(trimmed) else { return fallback }
         return String(trimmed.prefix(maximumRationaleCharacters))
+    }
+
+    /// Removes characters that change how following text is drawn rather than
+    /// adding anything a person reads.
+    ///
+    /// Model prose is shown in the interface next to Rank & Folder's own
+    /// wording. A direction override or an invisible separator inside it could
+    /// make the sentence display in an order the text does not actually have,
+    /// which is a way of making the app appear to say something it did not.
+    /// Ordinary spaces and single line breaks survive; everything in this set
+    /// does not.
+    static func displaySafeText(_ text: String) -> String {
+        let overrides: Set<Unicode.Scalar> = [
+            "\u{200B}", "\u{200C}", "\u{200D}", "\u{200E}", "\u{200F}",
+            "\u{202A}", "\u{202B}", "\u{202C}", "\u{202D}", "\u{202E}",
+            "\u{2066}", "\u{2067}", "\u{2068}", "\u{2069}",
+            "\u{2028}", "\u{2029}", "\u{FEFF}"
+        ]
+        let scalars = text.unicodeScalars.filter { scalar in
+            if overrides.contains(scalar) { return false }
+            if scalar == "\n" || scalar == "\t" { return true }
+            return !CharacterSet.controlCharacters.contains(scalar)
+        }
+        return String(String.UnicodeScalarView(scalars))
     }
 
     private static func containsDisallowedWriting(_ text: String) -> Bool {

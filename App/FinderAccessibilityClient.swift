@@ -129,14 +129,30 @@ final class FinderAccessibilityClient {
         return preSortOutcome
     }
 
+    /// Confirms that a running application really is the Finder macOS ships.
+    ///
+    /// The bundle location is checked against the one path Finder occupies on
+    /// every supported system. That path is inside the sealed system volume, so
+    /// a bundle sitting there is the real one. Anything else claiming the same
+    /// bundle identifier is refused rather than driven.
+    private func isSystemFinder(_ application: NSRunningApplication) -> Bool {
+        guard let bundleURL = application.bundleURL else { return false }
+        let path = bundleURL.resolvingSymlinksInPath().standardizedFileURL.path
+        return path == "/System/Library/CoreServices/Finder.app"
+    }
+
     private func activeFinderApplication() throws -> AXUIElement {
         guard AccessibilityPermission.isGranted else {
             throw FinderAccessibilityError.permissionRequired
         }
 
+        // A bundle identifier is a claim, not proof. Any application can carry
+        // com.apple.finder in its own Info.plist, so the running copy also has
+        // to be the one macOS ships before Rank & Folder reads its windows or
+        // presses its menu items.
         guard let finder = NSRunningApplication
             .runningApplications(withBundleIdentifier: "com.apple.finder")
-            .first else {
+            .first(where: isSystemFinder) else {
             throw FinderAccessibilityError.finderNotRunning
         }
 

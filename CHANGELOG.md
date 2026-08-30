@@ -3,6 +3,49 @@
 Notable changes to Rank & Folder. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Dates are ISO 8601.
 
+## [1.0.4] - 2026-08-30
+
+### Security
+
+- The managed Ollama runtime now has to be the same program that was installed.
+  Rank & Folder records the code directory hash of the executable at install
+  time, when it is known to have come from the archive whose SHA-256 was
+  checked, and requires that hash again before every later launch. Signature
+  verification on its own shows only that a program is unchanged since it was
+  signed, so a replacement written into the support folder and signed again
+  would have passed. A runtime installed by an earlier version has no recorded
+  hash and adopts its current one on first launch. Removing and reinstalling
+  the runtime from the Models window records a hash tied to a verified archive.
+- The managed runtime is started with a fixed environment rather than a copy of
+  the environment Rank & Folder was launched with. Ollama reads more than a
+  dozen `OLLAMA_` variables, so an inherited environment could have moved the
+  model directory or widened the origins the local server accepts without the
+  person choosing either. The child now receives only the loopback host and
+  origin, the private model directory, cloud mode off, `PATH`, `HOME`, and
+  `TMPDIR`.
+- A saved folder is recognized only when every stored fact about it agrees. A
+  bookmark can resolve by path after the folder it was made from is gone, so a
+  folder deleted and recreated at the same path could satisfy the bookmark
+  alone. When a record carries both a bookmark and a recorded filesystem
+  identifier, both are now checked.
+- Saved layouts and leave-alone exceptions read back from shared storage must
+  name an absolute path. The preference file they live in is writable by other
+  processes on the Mac, and a relative path would have been resolved against
+  whatever the working directory happened to be.
+- Finder automation confirms that the application it drives is the Finder macOS
+  ships, at its system path, rather than trusting any running program that
+  carries Finder's bundle identifier.
+- The archive safety checks no longer skip hidden entries, so a hidden symbolic
+  link pointing outside the staging folder is caught rather than ignored.
+- Explanatory text written by a local model is stripped of control characters
+  and text direction overrides before it is shown, so model prose cannot change
+  how the wording around it is drawn.
+- The download host allowlist is defined once instead of twice. Two copies can
+  drift, and the copy that is missed is the one deciding where a download may
+  come from.
+- Continuous integration runs with read-only permissions, and both workflows
+  pin their actions to reviewed commits rather than moving version tags.
+
 ## [1.0.2] - 2026-08-28
 
 ### Changed

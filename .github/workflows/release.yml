@@ -6,6 +6,11 @@ on:
   push:
     tags: ['v*']
 
+# A tag build publishes a release, so it needs write access to contents and
+# nothing else. A moving tag such as v3 can be repointed at any commit by
+# whoever controls the action repository, so the actions below are pinned to
+# the commit each tag named when it was reviewed. Dependabot still proposes
+# updates, and each one arrives as a reviewable change of commit.
 permissions:
   contents: write
 
@@ -14,7 +19,7 @@ jobs:
     name: Build and publish
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       # The app uses macOS 26 toolbar API. An #available check gates it at run
       # time, but the symbols still have to exist in the SDK to compile at all,
@@ -54,7 +59,7 @@ jobs:
         run: ./Scripts/release-notes.sh > "$RUNNER_TEMP/release-notes.md"
 
       - name: Publish the release
-        uses: softprops/action-gh-release@v3
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3
         with:
           files: |
             dist/*.dmg
