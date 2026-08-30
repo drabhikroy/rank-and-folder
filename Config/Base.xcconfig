@@ -12,8 +12,8 @@ MACOSX_DEPLOYMENT_TARGET = 14.0
 // Swift 6 rules through Package.swift, so raising this value is a deliberate,
 // separately verified migration rather than a configuration edit.
 SWIFT_VERSION = 5.0
-MARKETING_VERSION = 1.0.3
-CURRENT_PROJECT_VERSION = 4
+MARKETING_VERSION = 1.0.4
+CURRENT_PROJECT_VERSION = 5
 CODE_SIGN_STYLE = Automatic
 DEVELOPMENT_TEAM =
 ENABLE_HARDENED_RUNTIME = YES

@@ -3,6 +3,23 @@
 Notable changes to Rank & Folder. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Dates are ISO 8601.
 
+## [1.0.4] - 2026-08-30
+
+### Fixed
+
+- The managed Ollama runtime failed to install. The check added in 1.0.3 read
+  the code directory hash from a codesign description printed at a verbosity
+  that does not include it, so a correct install was reported as a program
+  macOS could not verify. The description is now requested at the verbosity
+  that prints the line, and the line it looks for is parsed in one place beside
+  the flags that produce it.
+- A verified install is no longer discarded when its identity cannot be
+  recorded. Recording the hash sat inside the same block as signature
+  verification, so a failure to record deleted an archive that had already
+  passed its checksum and its signature check. Recording is now separate, and a
+  failure leaves the install in place. The next launch then adopts the program
+  it finds, as it does for a runtime installed before pinning existed.
+
 ## [1.0.3] - 2026-08-30
 
 ### Security
