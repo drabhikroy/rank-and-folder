@@ -421,7 +421,7 @@ enum ManagedRuntimeInstaller {
         do {
             description = try runTool(
                 "/usr/bin/codesign",
-                arguments: ["--display", "--verbose=2", executable.path],
+                arguments: ["--display", "--verbose=4", executable.path],
                 captureOutput: true,
                 captureStandardError: true
             )
@@ -431,16 +431,33 @@ enum ManagedRuntimeInstaller {
             // archive problem.
             throw ManagedRuntimeError.signatureInvalid
         }
-        guard let line = description
-            .split(separator: "\n")
-            .first(where: { $0.hasPrefix("CDHash=") }) else {
-            throw ManagedRuntimeError.signatureInvalid
-        }
-        let hash = line.dropFirst("CDHash=".count).lowercased()
-        guard hash.count >= 40, hash.allSatisfy(\.isHexDigit) else {
+        guard let hash = codeDirectoryHash(inCodesignDescription: description) else {
             throw ManagedRuntimeError.signatureInvalid
         }
         return "\(releaseVersion):\(hash)"
+    }
+
+    /// Pulls the code directory hash out of a codesign description.
+    ///
+    /// codesign prints the `CDHash` line only at verbosity 4, and prints
+    /// `CandidateCDHash` lines beside it that name the same value in a
+    /// different form. Matching the exact prefix is what keeps those apart.
+    /// Kept separate from the process call so the format this expects and the
+    /// flags that produce it can be read together.
+    static func codeDirectoryHash(inCodesignDescription description: String) -> String? {
+        guard let line = description
+            .split(whereSeparator: \.isNewline)
+            .first(where: { $0.hasPrefix("CDHash=") }) else {
+            return nil
+        }
+        let hash = line
+            .dropFirst("CDHash=".count)
+            .trimmingCharacters(in: .whitespaces)
+            .lowercased()
+        guard hash.count >= 40, hash.allSatisfy(\.isHexDigit) else {
+            return nil
+        }
+        return hash
     }
 
     private static func findExecutable(in directory: URL) throws -> URL {
@@ -573,15 +590,19 @@ enum ManagedRuntimeInstaller {
         try manager.setAttributes([.posixPermissions: 0o755], ofItemAtPath: executable.path)
         do {
             try verifySignature(at: executable)
-            // This is the one moment the program is known to have come from the
-            // archive whose checksum was just checked, so it is the only moment
-            // its identity may be recorded.
-            try recordPinnedIdentity(of: executable)
         } catch {
             try? manager.removeItem(at: installationDirectory)
             forgetPinnedIdentity()
             throw ManagedRuntimeError.signatureInvalid
         }
+        // This is the one moment the program is known to have come from the
+        // archive whose checksum was just checked, so it is the only moment its
+        // identity may be recorded. Failing to record it is not a reason to
+        // discard an install that passed every check above. Recording is a
+        // convenience for later launches, and without it the next launch adopts
+        // the program it finds, exactly as it does for a runtime installed
+        // before pinning existed.
+        try? recordPinnedIdentity(of: executable)
         if manager.fileExists(atPath: compatibleInstallationDirectory.path) {
             try? manager.removeItem(at: compatibleInstallationDirectory)
         }
