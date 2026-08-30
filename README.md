@@ -49,10 +49,24 @@ drag **Rank & Folder** onto the Applications shortcut beside it.
 
 A zip is published alongside the disk image for anyone scripting the download.
 
-The build is signed to run on the machine that made it rather than with a paid
-Developer ID, so macOS will hold it on first launch. Right-click the app, choose
-Open, then confirm. You only do this once. If you prefer to trust nothing you
-did not compile, build from source instead.
+This build is signed to run on the machine that made it rather than with a paid
+Developer ID, so macOS holds both the disk image and the app the first time you
+open each of them. The message says Apple could not verify the file is free of
+malware. That is what macOS says about any software it has not seen notarized,
+including software that is fine. Check the download against the published
+checksums first, then allow it.
+
+On macOS 15 and later, including macOS 26, Apple no longer accepts a
+right-click to override this. Open the file, and when the warning appears
+choose **Done**. Then open **System Settings**, go to **Privacy & Security**,
+scroll to the **Security** section near the bottom, and click **Open Anyway**
+beside the file name. Confirm, and authenticate when asked. Do this within an
+hour of seeing the warning, or the button stops offering the file. You repeat
+it once for the disk image and once for the app, and then neither asks again.
+
+On macOS 14, right-click the file, choose **Open**, and confirm.
+
+If you prefer to trust nothing you did not compile, build from source instead.
 
 Check the download against the published checksums:
 
