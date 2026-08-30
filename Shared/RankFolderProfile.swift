@@ -459,7 +459,16 @@ public struct RankFolderProfile: Codable, Identifiable, Equatable, Sendable {
         }
         schemaVersion = Self.currentSchemaVersion
         id = try container.decode(UUID.self, forKey: .id)
-        folderPath = try container.decode(String.self, forKey: .folderPath)
+        // Stored records live in a preference file that other processes on this
+        // Mac can write. A path that is not absolute would be resolved against
+        // whatever the working directory happens to be, so it is refused at the
+        // edge rather than carried into the resolver.
+        let storedFolderPath = try container.decode(String.self, forKey: .folderPath)
+        folderPath = try Self.requireAbsolutePath(
+            storedFolderPath,
+            in: container,
+            forKey: .folderPath
+        )
         displayName = try container.decode(String.self, forKey: .displayName)
         descendantScope = savedSchemaVersion >= 4
             ? try container.decodeIfPresent(
@@ -559,18 +568,31 @@ public struct RankFolderProfile: Codable, Identifiable, Equatable, Sendable {
         updatedAt = Date()
     }
 
-    /// Prevents a saved path from silently reading a replacement folder.
-    /// Profiles without stored identity data must be added again before metadata is read.
+    /// Prevents a saved path from silently reading a replacement folder. Every
+    /// stored fact has to agree, not merely the strongest one available, and
+    /// profiles without stored identity data must be added again before
+    /// metadata is read.
+    ///
+    /// A bookmark can resolve by path when the folder it was made from is gone,
+    /// so a folder that was deleted and recreated at the same path can satisfy
+    /// the bookmark alone. The archived resource identifier is what tells those
+    /// two folders apart, so when a record carries both, both are checked.
     public var hasOriginalFolderIdentity: Bool {
+        // An identifier that cannot be read right now is missing evidence, not
+        // contrary evidence. The bookmark check below still has to pass, and it
+        // is what catches a folder that is gone rather than merely unreadable.
+        if let folderResourceIdentifier,
+           let currentIdentifier = Self.archivedResourceIdentifier(for: folderURL),
+           currentIdentifier != folderResourceIdentifier {
+            return false
+        }
         if let folderBookmarkData {
             guard let bookmarkedURL = try? Self.resolvedIdentityBookmark(folderBookmarkData) else {
                 return false
             }
             return Self.urlsReferToSameItem(bookmarkedURL, folderURL)
         }
-        guard let folderResourceIdentifier else { return true }
-        return Self.archivedResourceIdentifier(for: folderURL)
-            == folderResourceIdentifier
+        return true
     }
 
     /// Metadata views require evidence captured when the folder was added.
@@ -581,6 +603,24 @@ public struct RankFolderProfile: Codable, Identifiable, Equatable, Sendable {
             return false
         }
         return hasOriginalFolderIdentity
+    }
+
+    /// Refuses a stored folder path that is not an absolute path on this Mac.
+    /// Both saved layouts and leave-alone exceptions use it, so the same rule
+    /// applies to every record read back from shared storage.
+    static func requireAbsolutePath<Key: CodingKey>(
+        _ path: String,
+        in container: KeyedDecodingContainer<Key>,
+        forKey key: Key
+    ) throws -> String {
+        guard path.hasPrefix("/"), !path.contains("\0") else {
+            throw DecodingError.dataCorruptedError(
+                forKey: key,
+                in: container,
+                debugDescription: "A saved folder path has to be an absolute path."
+            )
+        }
+        return path
     }
 
     public static func normalizedPath(for url: URL) -> String {

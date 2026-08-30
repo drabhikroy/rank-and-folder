@@ -71,7 +71,14 @@ public struct FolderInheritanceBoundary: Codable, Identifiable, Equatable, Senda
         }
         schemaVersion = Self.currentSchemaVersion
         id = try container.decode(UUID.self, forKey: .id)
-        folderPath = try container.decode(String.self, forKey: .folderPath)
+        // Same rule as a saved layout: a record read back from shared storage
+        // has to name an absolute path before anything is done with it.
+        let storedFolderPath = try container.decode(String.self, forKey: .folderPath)
+        folderPath = try RankFolderProfile.requireAbsolutePath(
+            storedFolderPath,
+            in: container,
+            forKey: .folderPath
+        )
         displayName = try container.decode(String.self, forKey: .displayName)
         folderBookmarkData = try container.decodeIfPresent(Data.self, forKey: .folderBookmarkData)
         folderResourceIdentifier = try container.decodeIfPresent(

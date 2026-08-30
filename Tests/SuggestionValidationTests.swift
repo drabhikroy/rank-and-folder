@@ -271,4 +271,22 @@ final class SuggestionValidationTests: XCTestCase {
             "Refusing every redirect keeps the delegate policy simple and fail-closed."
         )
     }
+
+    func testDisplaySafeTextRemovesDirectionOverridesAndControlCharacters() {
+        let hostile = "Order by name\u{202E}\u{200B} then by size\u{0007}"
+        let safe = SuggestionRecipeValidator.displaySafeText(hostile)
+
+        XCTAssertEqual(safe, "Order by name then by size")
+    }
+
+    func testRationaleFromAModelIsStrippedBeforeItIsShown() {
+        let fallback = "Order items by name."
+        let rationale = SuggestionRecipeValidator.accessibleRationale(
+            "Grouping by kind\u{202E} keeps the folder readable.",
+            fallback: fallback
+        )
+
+        XCTAssertFalse(rationale.unicodeScalars.contains("\u{202E}"))
+        XCTAssertTrue(rationale.contains("Grouping by kind"))
+    }
 }

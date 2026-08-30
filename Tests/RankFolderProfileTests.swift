@@ -385,6 +385,62 @@ final class RankFolderProfileTests: XCTestCase {
         XCTAssertTrue(decoded.matches(folderURL: root))
     }
 
+    func testRelativeStoredPathIsRejected() {
+        let json = """
+        {
+          "schemaVersion": 4,
+          "id": "90D2C59F-C73D-49E8-91CB-4F6CDA9E0EAA",
+          "folderPath": "Relative/Downloads",
+          "displayName": "Downloads",
+          "recipe": {
+            "sections": [],
+            "itemOrder": [{"id":"11111111-1111-1111-1111-111111111111","criterion":"name"}]
+          },
+          "isEnabled": true,
+          "createdAt": 0,
+          "updatedAt": 0
+        }
+        """
+        XCTAssertThrowsError(
+            try JSONDecoder().decode(
+                RankFolderProfile.self,
+                from: Data(json.utf8)
+            )
+        )
+    }
+
+    func testIdentityFailsWhenTheStoredIdentifierDisagreesWithTheFolder() throws {
+        let root = FileManager.default.temporaryDirectory
+            .appendingPathComponent(
+                "RankFolderIdentityDisagreement-\(UUID().uuidString)",
+                isDirectory: true
+            )
+        let other = FileManager.default.temporaryDirectory
+            .appendingPathComponent(
+                "RankFolderIdentityOther-\(UUID().uuidString)",
+                isDirectory: true
+            )
+        defer {
+            try? FileManager.default.removeItem(at: root)
+            try? FileManager.default.removeItem(at: other)
+        }
+        try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+        try FileManager.default.createDirectory(at: other, withIntermediateDirectories: true)
+
+        var profile = RankFolderProfile(folderURL: root)
+        XCTAssertNotNil(profile.folderBookmarkData)
+        XCTAssertTrue(profile.hasOriginalFolderIdentity)
+
+        // A bookmark that still resolves to this path is no longer enough. The
+        // recorded identifier belongs to a different folder, which is what a
+        // folder replaced at the same path looks like.
+        profile.folderResourceIdentifier = RankFolderProfile.archivedResourceIdentifier(
+            for: other
+        )
+        XCTAssertFalse(profile.hasOriginalFolderIdentity)
+        XCTAssertFalse(profile.canSafelyReadFolderMetadata)
+    }
+
     private func decodeLegacy(_ json: String) throws -> RankFolderProfile {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .secondsSince1970

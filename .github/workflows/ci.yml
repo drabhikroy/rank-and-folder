@@ -10,12 +10,17 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Checking out and building needs nothing but read access. Stating that here
+# means a pull request from a fork cannot borrow a wider default token.
+permissions:
+  contents: read
+
 jobs:
   core-tests:
     name: Shared core tests
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       # The app uses macOS 26 toolbar API. An #available check gates it at run
       # time, but the symbols still have to exist in the SDK to compile at all,
@@ -38,7 +43,7 @@ jobs:
     name: Unsigned app build
     runs-on: macos-15
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       # The app uses macOS 26 toolbar API. An #available check gates it at run
       # time, but the symbols still have to exist in the SDK to compile at all,
@@ -69,7 +74,7 @@ jobs:
     name: House writing rules
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
 
       - name: Reject em and en dashes
         run: |
