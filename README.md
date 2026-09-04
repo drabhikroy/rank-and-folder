@@ -10,6 +10,9 @@
 
 Save a different way to group and sort each folder.
 
+Everything runs on your Mac. No account is required, no server is used,
+and your files are never moved, renamed, or read.
+
 <img src="Docs/images/home-dark.png" alt="The Rank & Folder home screen, showing the sidebar of saved folders and cards for organizing a folder and for the optional local model.">
 
 ## What it does
@@ -40,6 +43,17 @@ name, kind, dates, size, and tags.
 
 It asks for no Full Disk Access, no Screen Recording, no Input Monitoring, no
 camera, no microphone, no contacts, no calendars, and no location.
+
+## Requirements
+
+macOS 14 or later. Apple silicon or Intel.
+
+Two things are optional and both are off until you turn them on:
+
+| Feature | Needs | Without it |
+| --- | --- | --- |
+| Applying a layout to Finder | Accessibility permission | The app still saves layouts and shows previews |
+| Suggested layouts | A local model through Ollama | You build every layout yourself |
 
 ## Install
 
@@ -93,53 +107,41 @@ the app itself.
 
 On macOS 14, right-click the file, choose **Open**, and confirm.
 
-If you prefer to trust nothing you did not compile, build from source instead.
+If you prefer to trust nothing you did not compile, build from source
+instead. The steps are under [For developers](#for-developers).
 
 Check the download against the published checksums:
 
-```sh
+```bash
 shasum -a 256 -c SHA256SUMS.txt
 ```
 
-<details>
-<summary>Build from source</summary>
+## Local model
 
-```sh
-git clone https://github.com/drabhikroy/rank-and-folder.git
-cd rank-and-folder
+Layout suggestions are optional and run on your Mac through Ollama. Nothing is
+sent anywhere. The app talks only to `127.0.0.1` and refuses any redirect that
+leaves it.
 
-# Core logic and its tests, no Xcode project needed
-swift test
+What the model receives is a count summary: how many files of each kind, which
+date and size ranges appear, how many folders, and which tags are in use. It
+never receives filenames or file contents. What comes back is checked against a
+fixed list of criteria before it can become a layout, and you review the result
+before saving it.
 
-# The app itself
-open RankAndFolder.xcodeproj
-```
+You can point the app at an Ollama you already run, or let it install a pinned
+copy into its own support folder, verified by checksum and left entirely separate
+from any system-wide install.
 
-Set the bundle identifier, App Group, and signing team in `Config/Base.xcconfig`
-before running, or the Finder extension and the shared preference suite will not
-line up.
+## Accessibility
 
-To produce the same disk image and zip the releases carry:
-
-```sh
-brew install librsvg      # renders the icon
-./Scripts/build-standalone.sh
-```
-
-Both land in `dist/`, with a `SHA256SUMS.txt` beside them.
-
-</details>
-
-## Requirements
-
-macOS 14 or later. Apple silicon or Intel.
-
-Two things are optional and both are off until you turn them on:
-
-| Feature | Needs | Without it |
-| --- | --- | --- |
-| Applying a layout to Finder | Accessibility permission | The app still saves layouts and shows previews |
-| Suggested layouts | A local model through Ollama | You build every layout yourself |
+- Four color vision settings: standard colors, red-green color vision
+  deficiency, blue-yellow color vision deficiency, and complete color vision
+  deficiency. The setting drives the whole palette rather than status colors
+  alone
+- Three text sizes, standard, larger, and largest. Larger is the default
+- Light, dark, and system appearance
+- Onboarding animation is suppressed when Reduce Motion is on
+- Labels, hints, and traits on controls throughout for VoiceOver
 
 ## How it works
 
@@ -158,23 +160,35 @@ and anything ambiguous stops rather than guessing.
 
 See [Docs/Architecture.md](Docs/Architecture.md) for the full picture.
 
-## Local model
+## For developers
 
-Layout suggestions are optional and run on your Mac through Ollama. Nothing is
-sent anywhere. The app talks only to `127.0.0.1` and refuses any redirect that
-leaves it.
+### Running from source
 
-What the model receives is a count summary: how many files of each kind, which
-date and size ranges appear, how many folders, and which tags are in use. It
-never receives filenames or file contents. What comes back is checked against a
-fixed list of criteria before it can become a layout, and you review the result
-before saving it.
+```bash
+git clone https://github.com/drabhikroy/rank-and-folder.git
+cd rank-and-folder
 
-You can point the app at an Ollama you already run, or let it install a pinned
-copy into its own support folder, verified by checksum and left entirely separate
-from any system-wide install.
+# Core logic and its tests, no Xcode project needed
+swift test
 
-## Documentation
+# The app itself
+open RankAndFolder.xcodeproj
+```
+
+Set the bundle identifier, App Group, and signing team in `Config/Base.xcconfig`
+before running, or the Finder extension and the shared preference suite will not
+line up.
+
+To produce the same disk image and zip the releases carry:
+
+```bash
+brew install librsvg      # renders the icon
+./Scripts/build-standalone.sh
+```
+
+Both land in `dist/`, with a `SHA256SUMS.txt` beside them.
+
+### Documentation
 
 | Document | Covers |
 | --- | --- |
@@ -185,12 +199,28 @@ from any system-wide install.
 | [Distribution](Docs/Distribution.md) | How releases are built and signed |
 | [Privacy](PRIVACY.md) | Every piece of data the app reads or stores |
 | [Security policy](SECURITY.md) | How to report a vulnerability |
-| [Contributing](CONTRIBUTING.md) | Conventions, tests, and house writing rules |
-| [Changelog](CHANGELOG.md) | What changed in each release |
+
+## Contributing
+
+Conventions, tests, and house writing rules are in
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Releases
+
+What changed in each release is in [CHANGELOG.md](CHANGELOG.md).
+
+Disk images and zips are published on the
+[Releases](https://github.com/drabhikroy/rank-and-folder/releases) page,
+each with a `SHA256SUMS.txt` beside it.
 
 ## License
 
-[PolyForm Noncommercial License 1.0.0](LICENSE). Free for personal use,
-research, education, charities, and government. Commercial use is not permitted.
+[PolyForm Noncommercial License 1.0.0](LICENSE). The full text is also at
+<https://polyformproject.org/licenses/noncommercial/1.0.0>.
 
-Copyright 2026 Abhik Roy.
+Personal use, personal study, hobby projects, teaching, academic research, and
+use by charitable, educational, nonprofit, public research, public health, and
+government organizations are permitted. Commercial use is not permitted without
+a separate license.
+
+Required notice: Copyright 2026 Abhik Roy.
