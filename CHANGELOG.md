@@ -3,6 +3,17 @@
 Notable changes to Rank & Folder. Versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Dates are ISO 8601.
 
+## [1.0.5] - 2026-09-10
+
+### Changed
+
+- The app is now signed with a Developer ID Application certificate and
+  notarized by Apple, rather than signed ad hoc to run only on the machine
+  that built it. Opening the disk image or the standalone zip no longer holds
+  at Gatekeeper. The zip is now built after the disk image is notarized and
+  stapled rather than before, so it carries the same ticket the disk image
+  does instead of only an ad hoc signature.
+
 ## [1.0.4] - 2026-08-30
 
 ### Fixed
@@ -175,6 +186,7 @@ First public release.
 - The app never moves, renames, or deletes files, and never reads file contents.
 - Requires macOS 14 or later.
 
+[1.0.5]: https://github.com/drabhikroy/rank-and-folder/releases/tag/v1.0.5
 [1.0.2]: https://github.com/drabhikroy/rank-and-folder/releases/tag/v1.0.2
 [1.0.1]: https://github.com/drabhikroy/rank-and-folder/releases/tag/v1.0.1
 [1.0.0]: https://github.com/drabhikroy/rank-and-folder/releases/tag/v1.0.0

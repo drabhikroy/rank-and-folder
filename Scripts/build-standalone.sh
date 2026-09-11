@@ -5,6 +5,16 @@ script_directory="$(cd "$(dirname "$0")" && pwd)"
 repository_root="$(cd "$script_directory/.." && pwd)"
 artifact_directory="$repository_root/dist"
 configuration_file="$repository_root/Config/Base.xcconfig"
+notary_profile="${NOTARY_PROFILE:-rankandfolder}"
+
+do_notarize=0
+for arg in "${@:-}"; do
+    case "$arg" in
+        "")           ;;
+        --notarize)   do_notarize=1 ;;
+        *) echo "Usage: Scripts/build-standalone.sh [--notarize]"; exit 2 ;;
+    esac
+done
 
 marketing_version="$(
     awk -F ' *= *' '$1 == "MARKETING_VERSION" { print $2 }' \
@@ -221,38 +231,45 @@ xattr -cr "$app_bundle"
 # Code signing
 # ---------------------------------------------------------------------------
 
-# Ad hoc signing records the state of the finished bundle. It does not provide
-# Developer ID distribution or notarization.
+# Prefer a real Developer ID Application identity over ad hoc signing. grep
+# returns exit code 1 when nothing matches, which would stop the script under
+# set -e, so the || true keeps that from happening.
 
-codesign \
-    --force \
-    --options runtime \
-    --sign - \
-    "$app_bundle"
+developer_id="$(security find-identity -v -p codesigning 2>/dev/null \
+    | grep 'Developer ID Application' \
+    | head -1 \
+    | awk -F'"' '{print $2}' || true)"
+
+if [[ "$do_notarize" -eq 1 && -z "$developer_id" ]]; then
+    echo "--notarize requires a Developer ID Application identity."
+    exit 1
+fi
+
+if [[ -n "$developer_id" ]]; then
+    echo "Signing identity: $developer_id"
+    codesign \
+        --force \
+        --options runtime \
+        --timestamp \
+        --sign "$developer_id" \
+        "$app_bundle"
+else
+    echo "No Developer ID Application certificate found; signing ad hoc."
+    echo "This build records the state of the finished bundle on this machine"
+    echo "only. It does not carry Developer ID distribution or notarization."
+    codesign \
+        --force \
+        --options runtime \
+        --timestamp=none \
+        --sign - \
+        "$app_bundle"
+fi
 
 codesign \
     --verify \
     --strict \
     --verbose=2 \
     "$app_bundle"
-
-# ---------------------------------------------------------------------------
-# Zip
-# ---------------------------------------------------------------------------
-
-# Keep a zip beside the disk image for scripts and package managers that need
-# an archive they can unpack without mounting a disk image.
-
-ditto \
-    -c \
-    -k \
-    --norsrc \
-    --noextattr \
-    --noqtn \
-    --noacl \
-    --keepParent \
-    "$app_bundle" \
-    "$zip_path"
 
 # ---------------------------------------------------------------------------
 # Disk image
@@ -366,15 +383,53 @@ hdiutil convert \
     -o "$dmg_path" \
     -quiet
 
-codesign \
-    --force \
-    --sign - \
-    "$dmg_path"
+if [[ -n "$developer_id" ]]; then
+    codesign --force --sign "$developer_id" --timestamp "$dmg_path"
+else
+    codesign --force --sign - --timestamp=none "$dmg_path"
+fi
 
 codesign \
     --verify \
     --strict \
     "$dmg_path"
+
+# ---------------------------------------------------------------------------
+# Notarization
+# ---------------------------------------------------------------------------
+
+# Staple the ticket to both the DMG and the app bundle still on disk. A zip
+# cannot itself carry a staple, so the app bundle needs its own copy of the
+# ticket before it gets zipped below, or the zip would arrive unstapled even
+# though the DMG next to it is fine.
+
+if [[ "$do_notarize" -eq 1 ]]; then
+    echo "Submitting to Apple's notary service (profile: $notary_profile)..."
+    xcrun notarytool submit "$dmg_path" --keychain-profile "$notary_profile" --wait
+    xcrun stapler staple "$dmg_path"
+    xcrun stapler staple "$app_bundle"
+    echo "Notarized and stapled"
+fi
+
+# ---------------------------------------------------------------------------
+# Zip
+# ---------------------------------------------------------------------------
+
+# Keep a zip beside the disk image for scripts and package managers that need
+# an archive they can unpack without mounting a disk image. Built from the
+# app bundle after stapling, so a notarized build's zip carries the ticket
+# the same as the disk image does.
+
+ditto \
+    -c \
+    -k \
+    --norsrc \
+    --noextattr \
+    --noqtn \
+    --noacl \
+    --keepParent \
+    "$app_bundle" \
+    "$zip_path"
 
 # ---------------------------------------------------------------------------
 # Checksums
